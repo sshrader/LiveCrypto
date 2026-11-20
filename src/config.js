@@ -49,7 +49,7 @@ export function loadConfig(env = process.env) {
     llmProvider: env.LLM_PROVIDER || (env.LLM_API_KEY || env.LLM_BASE_URL ? 'openai' : 'anthropic'),
     llmKey: env.LLM_API_KEY || '',
     llmBase: (env.LLM_BASE_URL || 'https://openrouter.ai/api/v1').replace(/\/+$/, ''),
-    llmModel: env.LLM_MODEL || 'meta-llama/llama-3.3-70b-instruct:free',
+    llmModel: env.LLM_MODEL || 'nvidia/nemotron-3-ultra-550b-a55b:free,inclusionai/ling-3.2-flash:free,thinkingmachines/inkling-2-small:free',
     llmDelayMs: int(env.LLM_DELAY_MS, 4000),
     openaiKey: env.OPENAI_API_KEY || '',
     ttsModel: env.OPENAI_TTS_MODEL || 'gpt-4o-mini-tts',

@@ -68,3 +68,17 @@ test('repair pass: a rejected story is re-asked with the reasons and can then ai
   assert.equal(call, 2);
   assert.match(bodies[1], /rejected by an automatic checker/);
 });
+
+test('a model that 404s falls through to the next one in LLM_MODEL', async () => {
+  const cfg = loadConfig({ LLM_API_KEY: 'k', LLM_DELAY_MS: '0', LLM_MODEL: 'gone:free, good:free' });
+  const seen = [];
+  const fetchImpl = async (url, opts) => {
+    const m = JSON.parse(opts.body).model; seen.push(m);
+    if (m === 'gone:free') return res({ error: { message: 'This model is unavailable for free' } }, 404);
+    return res({ choices: [{ message: { content: JSON.stringify({ stories: mockStories([item('x')]) }) } }] });
+  };
+  const out = await generateStories([item('a'), item('b')], cfg, deps(fetchImpl));
+  assert.deepEqual(seen, ['gone:free', 'good:free', 'good:free']);
+  assert.equal(out.length, 2);
+  assert.match(writerLabel(cfg), /^gone:free \(\+fallbacks\)/);
+});

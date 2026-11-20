@@ -37,7 +37,7 @@ export const writerReady = (cfg) =>
   cfg.mockLlm || (cfg.llmProvider === 'openai' ? !!(cfg.llmKey || /localhost|127\.0\.0\.1/.test(cfg.llmBase)) : !!cfg.anthropicKey);
 export const writerLabel = (cfg) =>
   cfg.mockLlm ? 'mock'
-    : cfg.llmProvider === 'openai' ? (writerReady(cfg) ? `${cfg.llmModel} via ${new URL(cfg.llmBase).host}` : 'not configured')
+    : cfg.llmProvider === 'openai' ? (writerReady(cfg) ? `${cfg.llmModel.split(',')[0].trim()}${cfg.llmModel.includes(',') ? ' (+fallbacks)' : ''} via ${new URL(cfg.llmBase).host}` : 'not configured')
     : cfg.anthropicKey ? `claude (${cfg.model})` : 'not configured';
 
 /** Pull the first complete JSON object out of a model reply (handles code fences and chatter). */
@@ -65,11 +65,13 @@ const SHAPE = `Reply with ONLY one JSON object, no markdown and no commentary, i
 async function generateOpenAI(items, cfg, deps, feedback = {}) {
   const out = [];
   out.notes = {};
+  const models = String(cfg.llmModel).split(',').map((m) => m.trim()).filter(Boolean);
+  let mi = 0;
   for (let n = 0; n < items.length; n++) {
     if (n > 0) await sleep(cfg.llmDelayMs);
     const item = items[n];
     const body = {
-      model: cfg.llmModel,
+      model: models[mi],
       temperature: 0.6,
       max_tokens: 4000,
       messages: [
@@ -89,7 +91,7 @@ async function generateOpenAI(items, cfg, deps, feedback = {}) {
             ...(cfg.llmKey ? { authorization: `Bearer ${cfg.llmKey}` } : {}),
             'x-title': 'Purr & Bark',
           },
-          body: JSON.stringify(body),
+          body: JSON.stringify({ ...body, model: models[mi] }),
           signal: AbortSignal.timeout(120_000),
         });
         if (res.status === 429 || res.status >= 500) {
@@ -108,6 +110,12 @@ async function generateOpenAI(items, cfg, deps, feedback = {}) {
         if (!text) throw Object.assign(new Error('empty reply'), { retry: true });
       } catch (e) {
         lastErr = e;
+        if (e.fatal && /LLM API (400|404)/.test(e.message) && mi < models.length - 1) {
+          deps.log?.(`model ${models[mi]} unavailable, switching to ${models[mi + 1]}`);
+          mi++;
+          attempt = -1; // fresh tries on the next model
+          continue;
+        }
         if (e.fatal) throw e;
         if (attempt === 0) await sleep(Math.max(cfg.llmDelayMs, 6000));
       }

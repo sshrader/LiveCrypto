@@ -26,7 +26,7 @@ Run `npm run check-sources` (locally or in Railway's shell) to test every feed, 
 
 The writer can be any OpenAI-compatible chat endpoint. Set `LLM_API_KEY` and the server uses it instead of Anthropic.
 
-**OpenRouter (default).** Make a free account at openrouter.ai, create a key, set `LLM_API_KEY`. The default model is `meta-llama/llama-3.3-70b-instruct:free`; pick any model ending in `:free` from their list and set `LLM_MODEL`. Free models are rate-limited (and the free pool changes), so the server sends one request per story with `LLM_DELAY_MS` (4000) between them.
+**OpenRouter (default).** Make a free account at openrouter.ai, create a key, set `LLM_API_KEY`. `LLM_MODEL` takes one model or a comma-separated list; if the first is gone (free models rotate, a 404 means it was moved or removed) the next is used. The defaults are Nemotron 3 Ultra, Ling 3.2 Flash and Inkling 2 Small. Pick others ending in `:free` from openrouter.ai/collections/free-models. Free models are rate-limited (and the free pool changes), so the server sends one request per story with `LLM_DELAY_MS` (4000) between them.
 
 **Google AI Studio (Gemini free tier).** Get a key at aistudio.google.com, then set:
 `LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai`, `LLM_MODEL=<a current Gemini Flash model>`, `LLM_API_KEY=<key>`.
@@ -41,7 +41,7 @@ See `.env.example`. The main ones:
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `LLM_API_KEY` / `LLM_BASE_URL` / `LLM_MODEL` | none / OpenRouter / a free Llama | Free or any OpenAI-compatible writer |
+| `LLM_API_KEY` / `LLM_BASE_URL` / `LLM_MODEL` | none / OpenRouter / three free models | Free or any OpenAI-compatible writer |
 | `LLM_DELAY_MS` | 4000 | Pause between per-story requests |
 | `ANTHROPIC_API_KEY` | none | Use Claude instead (paid) |
 | `ANTHROPIC_MODEL` | `claude-sonnet-5-5` | `claude-haiku-5-5` is cheaper |
