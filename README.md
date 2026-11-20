@@ -4,7 +4,7 @@ Two animated anchors (Mochi Purr the cat, Biscuit Bark the dog) read stories tha
 
 1. Every `REFRESH_MINUTES` the server reads RSS feeds (Decrypt, Cointelegraph, CoinDesk, CryptoSlate, Bitcoin.com) and DexScreener's Solana data.
 2. It drops stale items and duplicates, groups the same story from several outlets, and ranks what is left.
-3. Claude writes one short segment per new item (forced tool call, so the reply is structured).
+3. A language model writes one short segment per new item. Free models work (see below); Claude gives the best results.
 4. Code checks each segment before it can air (see Safeguards). Failures are discarded.
 5. Optionally, OpenAI TTS makes one audio clip per line; otherwise the page uses browser voices.
 6. The page polls `/api/stories` every 30 s and airs unseen segments first.
@@ -15,12 +15,25 @@ No npm dependencies. Node 20+.
 
 1. Push this folder to a GitHub repo.
 2. Railway: **New Project → Deploy from GitHub repo**. It detects Node and uses `railway.json` (start `node src/server.js`, health check `/api/health`).
-3. **Variables**: add `ANTHROPIC_API_KEY`. Optional: `OPENAI_API_KEY` (AI voices), `ADMIN_TOKEN` (enables `POST /api/refresh`). Do not set `PORT`; Railway sets it.
+3. **Variables**: add `LLM_API_KEY` (free, see "Free writer" below) or `ANTHROPIC_API_KEY`. Optional: `OPENAI_API_KEY` (AI voices), `ADMIN_TOKEN` (enables `POST /api/refresh`). Do not set `PORT`; Railway sets it.
 4. **Volume**: add one, mount path `/data`, and set `DATA_DIR=/data`. This keeps stories, the seen-list and audio across deploys. Without it everything rebuilds after each deploy.
 5. **Settings → Networking → Generate Domain**, open it, press *Go live*.
 6. Check `https://<your-domain>/api/status`. It shows each feed's health, the last cycle (picked/built/rejected), and the last error. The first cycle runs about 3 s after boot.
 
 Run `npm run check-sources` (locally or in Railway's shell) to test every feed, DexScreener, and which writer/voice is configured.
+
+## Free writer (no cost)
+
+The writer can be any OpenAI-compatible chat endpoint. Set `LLM_API_KEY` and the server uses it instead of Anthropic.
+
+**OpenRouter (default).** Make a free account at openrouter.ai, create a key, set `LLM_API_KEY`. The default model is `meta-llama/llama-3.3-70b-instruct:free`; pick any model ending in `:free` from their list and set `LLM_MODEL`. Free models are rate-limited (and the free pool changes), so the server sends one request per story with `LLM_DELAY_MS` (4000) between them.
+
+**Google AI Studio (Gemini free tier).** Get a key at aistudio.google.com, then set:
+`LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai`, `LLM_MODEL=<a current Gemini Flash model>`, `LLM_API_KEY=<key>`.
+
+**Local (Ollama or LM Studio).** `LLM_BASE_URL=http://localhost:11434/v1`, `LLM_MODEL=<your model>`. Only works if the server runs on your own computer, not on Railway.
+
+Free models are less reliable at following the format and sticking to the source. The checker rejects bad output, and an item gets two tries before it is dropped, so expect fewer stories than with Claude. If a model gives mostly rejects, check `/api/status` (shows the rejected count) and try another model. The Gemini and OpenRouter endpoints were not tested from the build sandbox; the request format was tested against a fake server.
 
 ## Settings (env vars)
 
@@ -28,7 +41,9 @@ See `.env.example`. The main ones:
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | none | Required for real stories |
+| `LLM_API_KEY` / `LLM_BASE_URL` / `LLM_MODEL` | none / OpenRouter / a free Llama | Free or any OpenAI-compatible writer |
+| `LLM_DELAY_MS` | 4000 | Pause between per-story requests |
+| `ANTHROPIC_API_KEY` | none | Use Claude instead (paid) |
 | `ANTHROPIC_MODEL` | `claude-sonnet-5-5` | `claude-haiku-5-5` is cheaper |
 | `REFRESH_MINUTES` | 10 | Cycle interval |
 | `MAX_NEW_PER_CYCLE` | 3 | New segments per cycle (doubled while fewer than 6 exist) |

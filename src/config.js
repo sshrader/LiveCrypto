@@ -45,6 +45,12 @@ export function loadConfig(env = process.env) {
     anthropicKey: env.ANTHROPIC_API_KEY || '',
     model: env.ANTHROPIC_MODEL || 'claude-sonnet-5-5',
     mockLlm: env.MOCK_LLM === '1',
+    // Any OpenAI-compatible chat endpoint (OpenRouter, Gemini, Groq, Ollama...). Used when LLM_API_KEY or LLM_BASE_URL is set.
+    llmProvider: env.LLM_PROVIDER || (env.LLM_API_KEY || env.LLM_BASE_URL ? 'openai' : 'anthropic'),
+    llmKey: env.LLM_API_KEY || '',
+    llmBase: (env.LLM_BASE_URL || 'https://openrouter.ai/api/v1').replace(/\/+$/, ''),
+    llmModel: env.LLM_MODEL || 'meta-llama/llama-3.3-70b-instruct:free',
+    llmDelayMs: int(env.LLM_DELAY_MS, 4000),
     openaiKey: env.OPENAI_API_KEY || '',
     ttsModel: env.OPENAI_TTS_MODEL || 'gpt-4o-mini-tts',
     voiceLotti: env.TTS_VOICE_LOTTI || 'coral',

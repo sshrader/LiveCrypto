@@ -1,4 +1,5 @@
 // Run this on your own machine or in a Railway shell to see which feeds work:  npm run check-sources
+import { writerReady, writerLabel } from '../src/llm.js';
 import { loadConfig } from '../src/config.js';
 import { fetchFeeds } from '../src/ingest.js';
 import { fetchMarketItem } from '../src/dexscreener.js';
@@ -23,5 +24,5 @@ try {
   console.log('  FAIL', e.message);
 }
 
-console.log('\nWriter:', cfg.mockLlm ? 'MOCK_LLM (template stories)' : cfg.anthropicKey ? `Claude (${cfg.model})` : 'NOT CONFIGURED - set ANTHROPIC_API_KEY');
+console.log('\nWriter:', writerLabel(cfg), writerReady(cfg) ? '' : '- NOT CONFIGURED (set LLM_API_KEY or ANTHROPIC_API_KEY)');
 console.log('Voices:', cfg.openaiKey ? `OpenAI ${cfg.ttsModel}` : 'browser voices (set OPENAI_API_KEY for AI voices)');

@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { loadConfig } from './config.js';
 import { Store } from './store.js';
 import { runCycle } from './cycle.js';
+import { writerReady, writerLabel } from './llm.js';
 import { attachAudio, ttsEnabled } from './tts.js';
 import { SIGNOFF, WARMUP } from './static-segments.js';
 import { sha1 } from './util.js';
@@ -147,7 +148,7 @@ export function createApp(cfg, deps = {}) {
         running,
         feeds: st.feedStatus,
         lastCycle: lastSummary && { picked: lastSummary.picked, built: lastSummary.built, rejected: lastSummary.rejected.length },
-        writer: cfg.mockLlm ? 'mock' : cfg.anthropicKey ? 'claude' : 'not configured',
+        writer: writerLabel(cfg),
         voices: ttsEnabled(cfg) ? 'openai' : 'browser',
       });
     }
@@ -199,8 +200,8 @@ export function createApp(cfg, deps = {}) {
     await store.load();
     // Give the fixed segments voices too, so every line in the show sounds the same.
     for (const s of Object.values(statics)) await attachAudio(s, cfg, d);
-    if (!cfg.mockLlm && !cfg.anthropicKey) {
-      d.log('WARNING: ANTHROPIC_API_KEY is not set, so no stories will be written. Set it, or use MOCK_LLM=1 to test.');
+    if (!writerReady(cfg)) {
+      d.log('WARNING: no story writer is configured (set LLM_API_KEY for a free model, or ANTHROPIC_API_KEY), so no stories will be written. Use MOCK_LLM=1 to test.');
     }
     if (!ttsEnabled(cfg)) d.log('Voices: OPENAI_API_KEY not set, the page will use browser voices.');
     await new Promise((resolve) => server.listen(port, resolve));

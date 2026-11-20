@@ -33,9 +33,99 @@ export function mockStories(items) {
   });
 }
 
+export const writerReady = (cfg) =>
+  cfg.mockLlm || (cfg.llmProvider === 'openai' ? !!(cfg.llmKey || /localhost|127\.0\.0\.1/.test(cfg.llmBase)) : !!cfg.anthropicKey);
+export const writerLabel = (cfg) =>
+  cfg.mockLlm ? 'mock'
+    : cfg.llmProvider === 'openai' ? (writerReady(cfg) ? `${cfg.llmModel} via ${new URL(cfg.llmBase).host}` : 'not configured')
+    : cfg.anthropicKey ? `claude (${cfg.model})` : 'not configured';
+
+/** Pull the first complete JSON object out of a model reply (handles code fences and chatter). */
+export function extractJson(text) {
+  const t = String(text || '');
+  for (let start = t.indexOf('{'); start !== -1; start = t.indexOf('{', start + 1)) {
+    let depth = 0, inStr = false, esc = false;
+    for (let i = start; i < t.length; i++) {
+      const c = t[i];
+      if (inStr) { if (esc) esc = false; else if (c === '\\') esc = true; else if (c === '"') inStr = false; continue; }
+      if (c === '"') inStr = true;
+      else if (c === '{') depth++;
+      else if (c === '}' && --depth === 0) {
+        try { return JSON.parse(t.slice(start, i + 1)); } catch { break; }
+      }
+    }
+  }
+  return null;
+}
+
+const SHAPE = `Reply with ONLY one JSON object, no markdown and no commentary, in exactly this shape:
+{"stories":[{"itemId":"<the item id>","kind":"breaking|desk|trending","tag":"MARKETS","headline":"...","summary":"...","stat":{"label":"BTC","value":"$83.1K","sub":"SOURCE NAME","dir":"up|down|flat"},"facts":[{"k":"LABEL","v":"VALUE","s":"ok|warn|bad"},{"k":"..","v":"..","s":"ok"},{"k":"..","v":"..","s":"warn"}],"lines":[{"who":"lotti","text":"..."},{"who":"bram","text":"..."},{"who":"lotti","text":"..."},{"who":"bram","text":"..."}]}]}`;
+
+/** OpenAI-compatible writer: one item per request, JSON in plain text (free models are unreliable at tool calls). */
+async function generateOpenAI(items, cfg, deps) {
+  const out = [];
+  for (let n = 0; n < items.length; n++) {
+    if (n > 0) await sleep(cfg.llmDelayMs);
+    const item = items[n];
+    const body = {
+      model: cfg.llmModel,
+      temperature: 0.6,
+      max_tokens: 2500,
+      messages: [
+        { role: 'system', content: SYSTEM.replace(/by calling publish_stories/g, 'in the JSON reply') },
+        { role: 'user', content: buildUserMessage([item], deps.now()).replace(/by calling publish_stories\./, '') + '\n' + SHAPE },
+      ],
+    };
+    let text = null, lastErr;
+    for (let attempt = 0; attempt < 2 && text === null; attempt++) {
+      try {
+        const res = await deps.fetchImpl(`${cfg.llmBase}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            ...(cfg.llmKey ? { authorization: `Bearer ${cfg.llmKey}` } : {}),
+            'x-title': 'Gill & Horn',
+          },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(120_000),
+        });
+        if (res.status === 429 || res.status >= 500) {
+          const e = new Error(`LLM API ${res.status} (rate limit or provider busy)`);
+          e.retry = true;
+          throw e;
+        }
+        const data = await res.json().catch(() => null);
+        if (!res.ok) {
+          const e = new Error(`LLM API ${res.status}: ${data?.error?.message || 'request failed'}`);
+          e.fatal = true;
+          throw e;
+        }
+        text = data?.choices?.[0]?.message?.content ?? '';
+        if (!text) throw Object.assign(new Error('empty reply'), { retry: true });
+      } catch (e) {
+        lastErr = e;
+        if (e.fatal) throw e;
+        if (attempt === 0) await sleep(Math.max(cfg.llmDelayMs, 6000));
+      }
+    }
+    if (text === null) {
+      if (n === 0 && !out.length) throw lastErr; // nothing worked at all: treat as a writer outage, retry later
+      break; // keep what we have; the rest retry next cycle
+    }
+    const json = extractJson(text);
+    const story = Array.isArray(json?.stories) ? json.stories[0] : json && json.headline ? json : null;
+    if (story) out.push({ ...story, itemId: item.id });
+  }
+  return out;
+}
+
 /** Ask Claude for one segment per item. The reply is forced through a tool so it is always structured. */
 export async function generateStories(items, cfg, deps) {
   if (cfg.mockLlm) return mockStories(items);
+  if (cfg.llmProvider === 'openai') {
+    if (!writerReady(cfg)) throw new Error('LLM_API_KEY is not set (get a free key from OpenRouter or Google AI Studio, or set MOCK_LLM=1 to test)');
+    return generateOpenAI(items, cfg, deps);
+  }
   if (!cfg.anthropicKey) {
     throw new Error('ANTHROPIC_API_KEY is not set (or set MOCK_LLM=1 to test with template stories)');
   }
