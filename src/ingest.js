@@ -47,6 +47,16 @@ export const urlId = (u) => sha1(normUrl(u)).slice(0, 12);
  * Drop stale and already-covered items, group near-duplicate headlines from different outlets,
  * and rank what is left. Returns clusters shaped like story items.
  */
+const topicRe = new Map();
+function hasTopic(text, t) {
+  let re = topicRe.get(t);
+  if (!re) {
+    re = new RegExp(`(^|[^a-z0-9])${t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^a-z0-9])`, 'i');
+    topicRe.set(t, re);
+  }
+  return re.test(text);
+}
+
 export function prepareItems(raw, cfg, now = Date.now(), seen = {}) {
   const maxAgeMs = cfg.maxItemAgeHours * 3.6e6;
   const fresh = raw
@@ -76,9 +86,10 @@ export function prepareItems(raw, cfg, now = Date.now(), seen = {}) {
     const others = c.members.slice(1).filter((m) => m.outlet !== lead.outlet);
     const outlets = new Set(c.members.map((m) => m.outlet));
     const text = `${lead.title} ${lead.summary}`.toLowerCase();
-    const matches = cfg.topics.filter((t) => text.includes(t)).length;
+    const matches = cfg.topics.filter((t) => hasTopic(text, t)).length;
+    const priority = (cfg.priorityTopics || []).some((t) => hasTopic(text, t));
     const ageH = (now - Date.parse(lead.publishedAt)) / 3.6e6;
-    const score = 2 * Math.pow(2, -ageH / 6) + Math.min(2, matches * 0.5) + Math.min(1.8, 0.6 * (outlets.size - 1));
+    const score = 2 * Math.pow(2, -ageH / 6) + Math.min(2, matches * 0.5) + (priority ? 1.6 : 0) + Math.min(1.8, 0.6 * (outlets.size - 1));
     out.push({
       id: memberIds[0],
       memberIds,

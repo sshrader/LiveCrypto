@@ -57,3 +57,18 @@ test('fetchFeeds keeps going when one feed fails', async () => {
   assert.deepEqual(status.map((s) => [s.name, s.ok]), [['Alpha News', true], ['Beta Wire', false]]);
   assert.match(status[1].error, /503/);
 });
+
+test('Solana meme stories outrank equally fresh general news; topics match whole words only', () => {
+  const items = [
+    raw('Second quarter earnings beat estimates for bank', 'Alpha News', 1, 'https://alpha.test/b'),
+    raw('Bitcoin ETF flows cool this week', 'Beta Wire', 1, 'https://beta.test/e'),
+    raw('Pump.fun memecoin launches jump on Solana', 'Beta Wire', 3, 'https://beta.test/p'),
+  ];
+  const out = prepareItems(items, cfg, NOW, {});
+  assert.equal(out[0].title, 'Pump.fun memecoin launches jump on Solana');
+  // "sec" is a topic; "second" must not count as a match.
+  const bank = out.find((c) => /Second quarter/.test(c.title));
+  const plain = prepareItems([raw('Second quarter earnings beat estimates for bank', 'Alpha News', 1, 'https://alpha.test/b')], { ...cfg, priorityTopics: [] }, NOW, {})[0];
+  assert.ok(plain.score < 2.1, 'no topic bonus for "second"');
+  assert.ok(bank);
+});

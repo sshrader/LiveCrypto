@@ -53,3 +53,16 @@ test('cleanText truncates on a word boundary and removes control characters', ()
   assert.ok(t.endsWith('…'));
   assert.ok(!/[\u0000-\u001f]/.test(t));
 });
+
+test('aggregator items: publisher comes from <source>, title suffix and echo-description are dropped', () => {
+  const xml = `<rss><channel><item>
+    <title>Pump.fun volume surges 40% - Decrypt</title>
+    <link>https://news.google.com/rss/articles/abc</link>
+    <pubDate>Thu, 19 Nov 2026 18:00:00 GMT</pubDate>
+    <description>&lt;a href="x"&gt;Pump.fun volume surges 40%&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font&gt;Decrypt&lt;/font&gt;</description>
+    <source url="https://decrypt.co">Decrypt</source></item></channel></rss>`;
+  const [it] = parseFeed(xml, 'News: Pump.fun');
+  assert.equal(it.outlet, 'Decrypt');
+  assert.equal(it.title, 'Pump.fun volume surges 40%');
+  assert.equal(it.summary, '');
+});

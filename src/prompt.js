@@ -18,6 +18,7 @@ Rules
 9. stat: the single most important figure in the item as {label (max 16 chars), value (max 11 chars, such as "$83.1K" or "-30%"), sub (max 40 chars), dir "up" | "down" | "flat"}. If the item has no figure, use {label: the outlet name, value: "NEWS", sub: the publish date, dir: "flat"}.
 10. facts: exactly three short facts {k (max 13 chars, uppercase), v (max 12 chars), s "ok" | "warn" | "bad"}. ok means routine, warn means caution or unverified, bad means a clear risk. Mark single-source claims "warn". If the item gives fewer than three facts, fill with SOURCE (the outlet), PUBLISHED (the date) and CHECK (VERIFY, warn).
 11. summary: one to three sentences, at most 420 characters, in your own words, for the on-screen source card.
+12. If an item says "headline only", report only what the headline states, keep the dialogue to 4 lines, say it is based on the headline, and do not add any detail, number or background.
 Items with kind="market" get their stat and facts from the system, but still return valid values for them.`;
 
 export const STORY_TOOL = {
@@ -96,7 +97,7 @@ export function buildUserMessage(items, now = Date.now()) {
     return [
       `<item id="${esc(it.id)}" kind="${it.kind}" outlet="${esc(it.outlet)}" published="${esc(it.publishedAt)}" age_hours="${age}">`,
       `<title>${esc(it.title)}</title>`,
-      `<text>${esc(it.summary)}</text>`,
+      `<text>${it.summary ? esc(it.summary) : '(headline only: no article text was available)'}</text>`,
       coverage.length ? `<also_covered_by>${esc(coverage.join(', '))}</also_covered_by>` : '',
       '</item>',
     ].filter(Boolean).join('\n');

@@ -37,12 +37,17 @@ export function parseFeed(xml, outlet) {
   const blocks = [...String(xml).matchAll(/<(item|entry)[\s>][\s\S]*?<\/\1>/gi)].map((m) => m[0]);
   const items = [];
   for (const b of blocks) {
-    const title = cleanText(tagText(b, ['title']), 200);
+    let title = cleanText(tagText(b, ['title']), 200);
+    // Aggregators (Google News) name the real publisher in <source> and append it to the title.
+    const src = cleanText(tagText(b, ['source']), 60);
+    if (src && title.toLowerCase().endsWith(' - ' + src.toLowerCase())) title = title.slice(0, -(src.length + 3)).trim();
     const url = linkOf(b);
     const publishedAt = dateOf(b);
     if (!title || !url || !publishedAt) continue;
-    const summary = cleanText(tagText(b, ['description', 'summary', 'content:encoded', 'content']), 500);
-    items.push({ title, url, publishedAt, summary, outlet });
+    let summary = cleanText(tagText(b, ['description', 'summary', 'content:encoded', 'content']), 500);
+    // An aggregator description that only repeats the headline adds nothing.
+    if (src && (!summary || summary.toLowerCase().startsWith(title.slice(0, 30).toLowerCase()))) summary = '';
+    items.push({ title, url, publishedAt, summary, outlet: src || outlet });
   }
   return items;
 }

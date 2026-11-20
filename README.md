@@ -2,7 +2,7 @@
 
 Two animated anchors (Mochi Purr the cat, Biscuit Bark the dog) read stories that a small Node server builds on a timer:
 
-1. Every `REFRESH_MINUTES` the server reads RSS feeds (Decrypt, Cointelegraph, CoinDesk, CryptoSlate, Bitcoin.com) and DexScreener's Solana data.
+1. Every `REFRESH_MINUTES` the server reads RSS feeds (nine crypto outlets plus four Google News searches for Solana, Pump.fun and meme coins) and DexScreener's Solana data.
 2. It drops stale items and duplicates, groups the same story from several outlets, and ranks what is left.
 3. A language model writes one short segment per new item. Free models work (see below); Claude gives the best results.
 4. Code checks each segment before it can air (see Safeguards). Failures are discarded.
@@ -55,6 +55,10 @@ See `.env.example`. The main ones:
 | `OPENAI_API_KEY`, `TTS_VOICE_LOTTI`, `TTS_VOICE_BRAM` | none, coral, onyx | AI voices |
 | `MOCK_LLM` | off | `1` writes template stories with no API call (for testing) |
 | `ADMIN_TOKEN` | none | Enables `POST /api/refresh` with header `x-admin-token` |
+
+## Steering toward Solana meme coins
+
+Stories matching `PRIORITY_TOPICS` (Solana, memecoin, Pump.fun, BONK, WIF, Raydium, Jupiter, and so on) get a ranking boost, so they air before general crypto news. Change the list with `PRIORITY_TOPICS=a,b,c`. Google News items carry a headline only (no article text), so the writer is told to report just what the headline says. Add or replace feeds with `FEEDS="Name|url;Name|url"`; any Google News search works as `https://news.google.com/rss/search?q=<query>+when:2d&hl=en-US&gl=US&ceid=US:en`. A feed that fails shows up in `/api/status` and doesn't stop the others.
 
 ## Safeguards
 

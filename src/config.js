@@ -6,6 +6,21 @@ export const DEFAULT_FEEDS = [
   { name: 'CoinDesk', url: 'https://www.coindesk.com/arc/outboundfeeds/rss/?outputType=xml' },
   { name: 'CryptoSlate', url: 'https://cryptoslate.com/feed/' },
   { name: 'Bitcoin.com News', url: 'https://news.bitcoin.com/feed/' },
+  { name: 'CryptoPotato', url: 'https://cryptopotato.com/feed/' },
+  { name: 'U.Today', url: 'https://u.today/rss' },
+  { name: 'BeInCrypto', url: 'https://beincrypto.com/feed/' },
+  { name: 'Crypto Briefing', url: 'https://cryptobriefing.com/feed/' },
+  // Google News searches pull headlines from many outlets at once. The outlet name is taken from each item.
+  { name: 'News: Solana memecoins', url: 'https://news.google.com/rss/search?q=solana+memecoin+when:2d&hl=en-US&gl=US&ceid=US:en' },
+  { name: 'News: Pump.fun', url: 'https://news.google.com/rss/search?q=%22pump.fun%22+when:2d&hl=en-US&gl=US&ceid=US:en' },
+  { name: 'News: meme coins', url: 'https://news.google.com/rss/search?q=%22meme+coin%22+OR+memecoin+OR+bonk+OR+dogwifhat+when:2d&hl=en-US&gl=US&ceid=US:en' },
+  { name: 'News: Solana', url: 'https://news.google.com/rss/search?q=solana+crypto+when:1d&hl=en-US&gl=US&ceid=US:en' },
+];
+
+/** Stories that match any of these get a strong ranking boost. This is what steers the show toward Solana memes. */
+export const DEFAULT_PRIORITY_TOPICS = [
+  'solana', 'memecoin', 'meme coin', 'meme coins', 'memecoins', 'pump.fun', 'pumpfun', 'bonk', 'dogwifhat', 'wif',
+  'popcat', 'fartcoin', 'raydium', 'jupiter', 'meteora', 'launchpad', 'dexscreener', 'trump coin', 'ansem', 'cupsey',
 ];
 
 export const DEFAULT_TOPICS = [
@@ -56,6 +71,7 @@ export function loadConfig(env = process.env) {
     voiceLotti: env.TTS_VOICE_LOTTI || 'coral',
     voiceBram: env.TTS_VOICE_BRAM || 'onyx',
     feeds: parseFeeds(env.FEEDS) || DEFAULT_FEEDS,
+    priorityTopics: (env.PRIORITY_TOPICS ? env.PRIORITY_TOPICS.split(',') : DEFAULT_PRIORITY_TOPICS).map((x) => x.trim().toLowerCase()).filter(Boolean),
     topics: (env.TOPICS ? env.TOPICS.split(',') : DEFAULT_TOPICS)
       .map((s) => s.trim().toLowerCase())
       .filter(Boolean),
