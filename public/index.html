@@ -461,7 +461,7 @@ select {
   <div class="grid">
     <section class="main" aria-label="Studio">
       <div class="stage" id="stage" data-live="off">
-        <svg id="scene" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="An axolotl anchor and an ox anchor sitting behind a news desk">
+        <svg id="scene" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A cat anchor and a dog anchor sitting behind a news desk">
           <defs>
             <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" style="stop-color: var(--wall-top)"/>
@@ -517,80 +517,149 @@ select {
             <circle id="ck2d" class="dot ok" cx="1210" cy="193" r="8" fill="#5cc58f"/>
           </g>
 
-          <!-- Lotti, the axolotl -->
+          <defs>
+            <filter id="blur6" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="6"/></filter>
+            <filter id="blur2" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="2.2"/></filter>
+            <linearGradient id="rimR" x1="0" y1="0" x2="1" y2="0.3">
+              <stop offset="0.7" stop-color="#bfe9ff" stop-opacity="0"/>
+              <stop offset="1" stop-color="#bfe9ff" stop-opacity="0.3"/>
+            </linearGradient>
+            <radialGradient id="catFur" cx="0.36" cy="0.28" r="0.85">
+              <stop offset="0" stop-color="#ffe2b8"/><stop offset="0.5" stop-color="#f4a95d"/><stop offset="1" stop-color="#b9651f"/>
+            </radialGradient>
+            <radialGradient id="catEar" cx="0.4" cy="0.3" r="0.9">
+              <stop offset="0" stop-color="#f7b36a"/><stop offset="1" stop-color="#b9651f"/>
+            </radialGradient>
+            <radialGradient id="catEarIn" cx="0.5" cy="0.7" r="0.8">
+              <stop offset="0" stop-color="#ffb9c9"/><stop offset="1" stop-color="#d9738f"/>
+            </radialGradient>
+            <radialGradient id="catMuzzle" cx="0.4" cy="0.3" r="0.85">
+              <stop offset="0" stop-color="#fffaf0"/><stop offset="1" stop-color="#efd3ad"/>
+            </radialGradient>
+            <radialGradient id="catEye" cx="0.45" cy="0.3" r="0.8">
+              <stop offset="0" stop-color="#e3ffb0"/><stop offset="0.5" stop-color="#69bd4e"/><stop offset="1" stop-color="#1f5a2c"/>
+            </radialGradient>
+            <radialGradient id="catNose" cx="0.4" cy="0.3" r="0.8">
+              <stop offset="0" stop-color="#ffb3c6"/><stop offset="1" stop-color="#d0587a"/>
+            </radialGradient>
+            <linearGradient id="catBlazer" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#f3cb6a"/><stop offset="0.6" stop-color="#d3a03a"/><stop offset="1" stop-color="#8f6620"/>
+            </linearGradient>
+            <radialGradient id="dogFur" cx="0.36" cy="0.28" r="0.85">
+              <stop offset="0" stop-color="#f0c48f"/><stop offset="0.5" stop-color="#c98a45"/><stop offset="1" stop-color="#7d4a22"/>
+            </radialGradient>
+            <linearGradient id="dogEar" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#9a6238"/><stop offset="1" stop-color="#46280f"/>
+            </linearGradient>
+            <radialGradient id="dogMuzzle" cx="0.4" cy="0.3" r="0.85">
+              <stop offset="0" stop-color="#fff0d6"/><stop offset="1" stop-color="#dcb987"/>
+            </radialGradient>
+            <radialGradient id="dogNose" cx="0.38" cy="0.3" r="0.85">
+              <stop offset="0" stop-color="#6a6a72"/><stop offset="0.5" stop-color="#25252b"/><stop offset="1" stop-color="#09090c"/>
+            </radialGradient>
+            <radialGradient id="dogEye" cx="0.4" cy="0.3" r="0.8">
+              <stop offset="0" stop-color="#5b4332"/><stop offset="0.6" stop-color="#1c130d"/><stop offset="1" stop-color="#0a0705"/>
+            </radialGradient>
+            <linearGradient id="suit" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#34507c"/><stop offset="0.6" stop-color="#1d2f4d"/><stop offset="1" stop-color="#0f1829"/>
+            </linearGradient>
+            <linearGradient id="tie" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#d8583a"/><stop offset="0.5" stop-color="#b8402a"/><stop offset="1" stop-color="#7e2616"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Lotti, the cat -->
           <g id="lotti" class="anchor">
             <g class="bob">
-              <rect x="345" y="462" width="190" height="150" rx="46" fill="#dba944"/>
+              <ellipse cx="440" cy="478" rx="112" ry="20" fill="#000" opacity="0.4" filter="url(#blur6)"/>
+              <rect x="345" y="462" width="190" height="150" rx="46" fill="url(#catBlazer)"/>
               <path d="M415 462 L440 524 L465 462 Z" fill="#f6efe2"/>
-              <path d="M415 462 L392 472 L430 548 L440 524 Z" fill="#b8862b"/>
-              <path d="M465 462 L488 472 L450 548 L440 524 Z" fill="#b8862b"/>
+              <path d="M415 462 L392 472 L430 548 L440 524 Z" fill="#a57725"/>
+              <path d="M465 462 L488 472 L450 548 L440 524 Z" fill="#8a6120"/>
               <circle cx="486" cy="500" r="7" fill="#f6efe2"/>
-              <!-- gills behind the head -->
-              <g fill="#e8607f">
-                <ellipse cx="318" cy="318" rx="58" ry="13" transform="rotate(-28 318 318)"/>
-                <ellipse cx="304" cy="362" rx="62" ry="13" transform="rotate(2 304 362)"/>
-                <ellipse cx="318" cy="406" rx="56" ry="13" transform="rotate(28 318 406)"/>
-                <ellipse cx="562" cy="318" rx="58" ry="13" transform="rotate(28 562 318)"/>
-                <ellipse cx="576" cy="362" rx="62" ry="13" transform="rotate(-2 576 362)"/>
-                <ellipse cx="562" cy="406" rx="56" ry="13" transform="rotate(-28 562 406)"/>
+              <ellipse cx="483" cy="497" rx="3" ry="2" fill="#fff" opacity="0.8"/>
+              <!-- ears -->
+              <path d="M346 326 C336 272 344 240 360 228 C392 236 418 256 426 284 Z" fill="url(#catEar)"/>
+              <path d="M534 326 C544 272 536 240 520 228 C488 236 462 256 454 284 Z" fill="url(#catEar)"/>
+              <path d="M362 300 C358 274 364 256 371 248 C390 256 403 266 407 284 Z" fill="url(#catEarIn)"/>
+              <path d="M518 300 C522 274 516 256 509 248 C490 256 477 266 473 284 Z" fill="url(#catEarIn)"/>
+              <!-- head -->
+              <ellipse cx="440" cy="466" rx="92" ry="14" fill="#000" opacity="0.28" filter="url(#blur2)"/>
+              <ellipse cx="440" cy="362" rx="121" ry="99" fill="url(#catFur)"/>
+              <ellipse cx="440" cy="362" rx="119" ry="97" fill="none" stroke="url(#rimR)" stroke-width="3"/>
+              <path d="M440 268 v24 M416 273 q2 13 8 22 M464 273 q-2 13 -8 22" fill="none" stroke="#b9591a" stroke-width="7" stroke-linecap="round" opacity="0.75"/>
+              <ellipse cx="404" cy="308" rx="58" ry="22" fill="#fff" opacity="0.28" transform="rotate(-16 404 308)" filter="url(#blur2)"/>
+              <ellipse cx="376" cy="384" rx="22" ry="13" fill="#ff8aa5" opacity="0.45" filter="url(#blur2)"/>
+              <ellipse cx="504" cy="384" rx="22" ry="13" fill="#ff8aa5" opacity="0.45" filter="url(#blur2)"/>
+              <ellipse cx="440" cy="398" rx="56" ry="39" fill="url(#catMuzzle)"/>
+              <ellipse cx="428" cy="380" rx="26" ry="10" fill="#fff" opacity="0.45" filter="url(#blur2)"/>
+              <g stroke="#fff6e4" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.85">
+                <path d="M388 392 L318 378 M388 399 L314 402 M390 406 L322 424"/>
+                <path d="M492 392 L562 378 M492 399 L566 402 M490 406 L558 424"/>
               </g>
-              <g fill="#f08aa4">
-                <circle cx="266" cy="296" r="9"/>
-                <circle cx="248" cy="362" r="9"/>
-                <circle cx="268" cy="428" r="9"/>
-                <circle cx="614" cy="296" r="9"/>
-                <circle cx="632" cy="362" r="9"/>
-                <circle cx="612" cy="428" r="9"/>
-              </g>
-              <ellipse cx="440" cy="360" rx="120" ry="96" fill="#f6b3c3"/>
-              <ellipse cx="402" cy="310" rx="52" ry="22" fill="#ffffff" opacity="0.14"/>
-              <ellipse cx="372" cy="374" rx="18" ry="10" fill="#ee7b97" opacity="0.6"/>
-              <ellipse cx="508" cy="374" rx="18" ry="10" fill="#ee7b97" opacity="0.6"/>
               <g class="blink">
-                <circle cx="395" cy="336" r="16" fill="#2a1722"/>
-                <circle cx="401" cy="330" r="5.5" fill="#ffffff"/>
+                <ellipse cx="394" cy="342" rx="25" ry="26" fill="#b9651f" opacity="0.28"/>
+                <circle cx="394" cy="340" r="20" fill="url(#catEye)"/>
+                <ellipse cx="394" cy="341" rx="8.5" ry="14" fill="#120d0b"/>
+                <circle cx="387" cy="332" r="6.5" fill="#fff"/>
+                <circle cx="400" cy="348" r="3" fill="#fff" opacity="0.85"/>
               </g>
               <g class="blink b2">
-                <circle cx="485" cy="336" r="16" fill="#2a1722"/>
-                <circle cx="491" cy="330" r="5.5" fill="#ffffff"/>
+                <ellipse cx="486" cy="342" rx="25" ry="26" fill="#b9651f" opacity="0.28"/>
+                <circle cx="486" cy="340" r="20" fill="url(#catEye)"/>
+                <ellipse cx="486" cy="341" rx="8.5" ry="14" fill="#120d0b"/>
+                <circle cx="479" cy="332" r="6.5" fill="#fff"/>
+                <circle cx="492" cy="348" r="3" fill="#fff" opacity="0.85"/>
               </g>
-              <path d="M398 384 Q440 414 482 384" fill="none" stroke="#7a2c46" stroke-width="5" stroke-linecap="round"/>
-              <ellipse id="lottiMouth" cx="440" cy="396" rx="30" ry="3" fill="#5a1f33"/>
-              <ellipse id="lottiTongue" cx="440" cy="404" rx="15" ry="5" fill="#e8607f" opacity="0"/>
+              <path d="M429 377 Q440 372 451 377 Q447 388 440 391 Q433 388 429 377 Z" fill="url(#catNose)"/>
+              <ellipse cx="436" cy="377" rx="5" ry="2.2" fill="#fff" opacity="0.7"/>
+              <path d="M440 391 L440 397 M440 397 Q430 407 416 400 M440 397 Q450 407 464 400" fill="none" stroke="#8a4a3a" stroke-width="3" stroke-linecap="round"/>
+              <ellipse id="lottiMouth" cx="440" cy="406" rx="20" ry="3" fill="#5a1f33"/>
+              <ellipse id="lottiTongue" cx="440" cy="414" rx="11" ry="5" fill="#ee6f8d" opacity="0"/>
             </g>
           </g>
 
-          <!-- Bram, the ox -->
+          <!-- Bram, the dog -->
           <g id="bram" class="anchor">
             <g class="bob">
-              <rect x="735" y="466" width="230" height="150" rx="52" fill="#1d2c44"/>
+              <ellipse cx="850" cy="482" rx="116" ry="20" fill="#000" opacity="0.4" filter="url(#blur6)"/>
+              <rect x="735" y="466" width="230" height="150" rx="52" fill="url(#suit)"/>
               <path d="M815 466 L850 542 L885 466 Z" fill="#f6efe2"/>
-              <path d="M815 466 L790 478 L838 578 L850 542 Z" fill="#162236"/>
-              <path d="M885 466 L910 478 L862 578 L850 542 Z" fill="#162236"/>
-              <path d="M841 496 L859 496 L865 560 L850 576 L835 560 Z" fill="#b8462b"/>
+              <path d="M815 466 L790 478 L838 578 L850 542 Z" fill="#14203a"/>
+              <path d="M885 466 L910 478 L862 578 L850 542 Z" fill="#0d1628"/>
+              <path d="M841 496 L859 496 L865 560 L850 576 L835 560 Z" fill="url(#tie)"/>
               <path d="M837 478 L863 478 L859 498 L841 498 Z" fill="#9a3a23"/>
               <path d="M912 500 L934 496 L934 512 L912 514 Z" fill="#dba944"/>
-              <path d="M790 292 C746 290 722 276 724 250" fill="none" stroke="#eadfc4" stroke-width="20" stroke-linecap="round"/>
-              <path d="M910 292 C954 290 978 276 976 250" fill="none" stroke="#eadfc4" stroke-width="20" stroke-linecap="round"/>
-              <ellipse cx="756" cy="338" rx="34" ry="16" transform="rotate(18 756 338)" fill="#5d6b80"/>
-              <ellipse cx="944" cy="338" rx="34" ry="16" transform="rotate(-18 944 338)" fill="#5d6b80"/>
-              <rect x="770" y="268" width="160" height="190" rx="62" fill="#71809a"/>
-              <path d="M806 272 Q850 236 894 272 Q850 290 806 272 Z" fill="#3f4a5e"/>
-              <ellipse cx="850" cy="414" rx="72" ry="46" fill="#cdbba0"/>
-              <ellipse cx="826" cy="396" rx="7" ry="10" fill="#6b5a45"/>
-              <ellipse cx="874" cy="396" rx="7" ry="10" fill="#6b5a45"/>
-              <circle cx="850" cy="410" r="9" fill="none" stroke="#dba944" stroke-width="4"/>
-              <path d="M790 318 L832 326" fill="none" stroke="#2f394b" stroke-width="9" stroke-linecap="round"/>
-              <path d="M910 318 L868 326" fill="none" stroke="#2f394b" stroke-width="9" stroke-linecap="round"/>
+              <!-- floppy ears -->
+              <path d="M768 296 C728 296 710 358 718 422 C724 450 758 454 772 426 C782 396 782 336 792 302 Z" fill="url(#dogEar)"/>
+              <path d="M932 296 C972 296 990 358 982 422 C976 450 942 454 928 426 C918 396 918 336 908 302 Z" fill="url(#dogEar)"/>
+              <path d="M742 318 C730 350 730 392 738 418" fill="none" stroke="#c78d5a" stroke-width="4" stroke-linecap="round" opacity="0.35"/>
+              <!-- head -->
+              <ellipse cx="850" cy="470" rx="96" ry="14" fill="#000" opacity="0.3" filter="url(#blur2)"/>
+              <ellipse cx="850" cy="362" rx="108" ry="100" fill="url(#dogFur)"/>
+              <ellipse cx="850" cy="362" rx="106" ry="98" fill="none" stroke="url(#rimR)" stroke-width="3"/>
+              <path d="M850 270 Q850 300 850 316" fill="none" stroke="#f0c48f" stroke-width="16" stroke-linecap="round" opacity="0.45" filter="url(#blur2)"/>
+              <ellipse cx="814" cy="308" rx="56" ry="20" fill="#fff" opacity="0.26" transform="rotate(-14 814 308)" filter="url(#blur2)"/>
+              <ellipse cx="850" cy="418" rx="68" ry="48" fill="url(#dogMuzzle)"/>
+              <g fill="#8a5a3a" opacity="0.5">
+                <circle cx="818" cy="410" r="2.4"/><circle cx="828" cy="417" r="2.4"/><circle cx="820" cy="424" r="2.4"/>
+                <circle cx="882" cy="410" r="2.4"/><circle cx="872" cy="417" r="2.4"/><circle cx="880" cy="424" r="2.4"/>
+              </g>
+              <path d="M790 320 L832 328 M910 320 L868 328" fill="none" stroke="#5a3519" stroke-width="10" stroke-linecap="round"/>
               <g class="blink">
-                <ellipse cx="812" cy="342" rx="11" ry="9" fill="#101820"/>
-                <circle cx="816" cy="339" r="3" fill="#ffffff"/>
+                <ellipse cx="812" cy="348" rx="13" ry="12" fill="url(#dogEye)"/>
+                <circle cx="808" cy="343" r="4.2" fill="#fff"/>
+                <path d="M798 347 A14 14 0 0 1 826 347 Z" fill="#b87a3e"/>
               </g>
               <g class="blink b2">
-                <ellipse cx="888" cy="342" rx="11" ry="9" fill="#101820"/>
-                <circle cx="892" cy="339" r="3" fill="#ffffff"/>
+                <ellipse cx="888" cy="348" rx="13" ry="12" fill="url(#dogEye)"/>
+                <circle cx="884" cy="343" r="4.2" fill="#fff"/>
+                <path d="M874 347 A14 14 0 0 1 902 347 Z" fill="#b87a3e"/>
               </g>
-              <ellipse id="bramMouth" cx="850" cy="438" rx="24" ry="3" fill="#3a2a22"/>
+              <ellipse cx="850" cy="388" rx="24" ry="16" fill="url(#dogNose)"/>
+              <ellipse cx="842" cy="382" rx="9" ry="4" fill="#fff" opacity="0.55" transform="rotate(-12 842 382)"/>
+              <path d="M850 402 L850 424 M850 424 Q836 438 818 430 M850 424 Q864 438 882 430" fill="none" stroke="#6b4a2c" stroke-width="3" stroke-linecap="round"/>
+              <ellipse id="bramMouth" cx="850" cy="442" rx="22" ry="3" fill="#3a1d16"/>
             </g>
           </g>
 
@@ -600,12 +669,12 @@ select {
           <rect x="0" y="578" width="1280" height="142" fill="#35241a"/>
           <rect x="0" y="578" width="1280" height="5" fill="#dba944"/>
           <g class="plate" id="plateLotti">
-            <rect x="355" y="540" width="170" height="30" rx="4"/>
-            <text x="440" y="562" text-anchor="middle" class="f-display" font-size="19" font-weight="700" letter-spacing="2.5">LOTTI FROND</text>
+            <rect x="345" y="540" width="190" height="30" rx="4"/>
+            <text x="440" y="562" text-anchor="middle" class="f-display" font-size="19" font-weight="700" letter-spacing="2.5">MOCHI PURR</text>
           </g>
           <g class="plate" id="plateBram">
-            <rect x="765" y="540" width="170" height="30" rx="4"/>
-            <text x="850" y="562" text-anchor="middle" class="f-display" font-size="19" font-weight="700" letter-spacing="2.5">BRAM OXLEY</text>
+            <rect x="755" y="540" width="190" height="30" rx="4"/>
+            <text x="850" y="562" text-anchor="middle" class="f-display" font-size="19" font-weight="700" letter-spacing="2.5">BISCUIT BARK</text>
           </g>
           <!-- Mugs -->
           <rect x="570" y="506" width="26" height="24" rx="4" fill="#f6efe2"/>
@@ -636,8 +705,8 @@ select {
         <label class="check" for="voiceOn"><input type="checkbox" id="voiceOn" checked> Voices on</label>
         <label class="sel" for="voiceMode">Voice set <select id="voiceMode"><option value="browser">Browser voices</option></select></label>
         <div class="voices" id="voiceBox" hidden>
-          <label for="voiceLotti">Lotti <select id="voiceLotti"></select></label>
-          <label for="voiceBram">Bram <select id="voiceBram"></select></label>
+          <label for="voiceLotti">Mochi <select id="voiceLotti"></select></label>
+          <label for="voiceBram">Biscuit <select id="voiceBram"></select></label>
         </div>
       </div>
 
@@ -700,8 +769,8 @@ select {
   var SEGMENTS = [];
 
   var ANCHORS = {
-    lotti: { name: 'Lotti Frond', pitch: 1.45, rate: 1.08, prefer: /female|samantha|zira|aria|jenny|karen|moira|susan|hazel|google uk english female/i },
-    bram:  { name: 'Bram Oxley', pitch: 0.55, rate: 0.92, prefer: /\bmale\b|daniel|david|guy|alex|fred|mark|google uk english male|george/i }
+    lotti: { name: 'Mochi Purr', pitch: 1.45, rate: 1.08, prefer: /female|samantha|zira|aria|jenny|karen|moira|susan|hazel|google uk english female/i },
+    bram:  { name: 'Biscuit Bark', pitch: 0.55, rate: 0.92, prefer: /\bmale\b|daniel|david|guy|alex|fred|mark|google uk english male|george/i }
   };
 
   var state = { index: 0, lastId: null, running: false, runId: 0, cancelLine: null, ttsBroken: false, studioBroken: false };
@@ -904,8 +973,8 @@ select {
 
   /* ------------------------- Mouths ------------------------- */
   var mouths = {
-    lotti: { el: $('lottiMouth'), tongue: $('lottiTongue'), min: 3, max: 24, cy: 396, cur: 0, ph: 0 },
-    bram:  { el: $('bramMouth'), tongue: null, min: 3, max: 17, cy: 438, cur: 0, ph: 1.3 }
+    lotti: { el: $('lottiMouth'), tongue: $('lottiTongue'), min: 3, max: 19, cy: 406, cur: 0, ph: 0 },
+    bram:  { el: $('bramMouth'), tongue: null, min: 3, max: 16, cy: 442, cur: 0, ph: 1.3 }
   };
   var studio = { available: false, ctx: null, analyser: null, gain: null, buf: null, cache: {}, playing: false };
   function readLevel() {

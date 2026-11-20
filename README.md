@@ -1,6 +1,6 @@
 # Gill & Horn: live crypto news desk
 
-Two animated anchors (Lotti the axolotl, Bram the ox) read stories that a small Node server builds on a timer:
+Two animated anchors (Mochi Purr the cat, Biscuit Bark the dog) read stories that a small Node server builds on a timer:
 
 1. Every `REFRESH_MINUTES` the server reads RSS feeds (Decrypt, Cointelegraph, CoinDesk, CryptoSlate, Bitcoin.com) and DexScreener's Solana data.
 2. It drops stale items and duplicates, groups the same story from several outlets, and ranks what is left.
