@@ -65,6 +65,6 @@ export function loadConfig(env = process.env) {
       minVolume1hUsd: int(env.MIN_VOLUME_1H_USD, 10000),
       top: int(env.MOVERS_COUNT, 3),
     },
-    userAgent: env.USER_AGENT || 'GillAndHornBot/1.0 (news desk)',
+    userAgent: env.USER_AGENT || 'PurrAndBarkBot/1.0 (news desk)',
   };
 }

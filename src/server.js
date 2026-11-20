@@ -232,7 +232,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const cfg = loadConfig();
   const app = createApp(cfg);
   const port = await app.start();
-  console.log(`Gill & Horn is on port ${port}`);
+  console.log(`Purr & Bark is on port ${port}`);
   const bye = async () => {
     setTimeout(() => process.exit(0), 5000).unref();
     await app.stop();

@@ -1,4 +1,4 @@
-# Gill & Horn: live crypto news desk
+# Purr & Bark: live crypto news desk
 
 Two animated anchors (Mochi Purr the cat, Biscuit Bark the dog) read stories that a small Node server builds on a timer:
 

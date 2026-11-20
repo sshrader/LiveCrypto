@@ -12,7 +12,7 @@ export const SIGNOFF = {
     { k: 'ADVICE', v: 'NONE', s: 'ok' },
   ],
   source: {
-    outlet: 'Gill & Horn desk',
+    outlet: 'Purr & Bark desk',
     url: '',
     date: '',
     publishedAt: '',
@@ -41,7 +41,7 @@ export const WARMUP = {
     { k: 'ADVICE', v: 'NONE', s: 'ok' },
   ],
   source: {
-    outlet: 'Gill & Horn desk',
+    outlet: 'Purr & Bark desk',
     url: '',
     date: '',
     publishedAt: '',

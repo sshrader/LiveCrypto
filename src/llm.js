@@ -84,7 +84,7 @@ async function generateOpenAI(items, cfg, deps) {
           headers: {
             'content-type': 'application/json',
             ...(cfg.llmKey ? { authorization: `Bearer ${cfg.llmKey}` } : {}),
-            'x-title': 'Gill & Horn',
+            'x-title': 'Purr & Bark',
           },
           body: JSON.stringify(body),
           signal: AbortSignal.timeout(120_000),
