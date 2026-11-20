@@ -62,7 +62,7 @@ const SHAPE = `Reply with ONLY one JSON object, no markdown and no commentary, i
 {"stories":[{"itemId":"<the item id>","kind":"breaking|desk|trending","tag":"MARKETS","headline":"...","summary":"...","stat":{"label":"BTC","value":"$83.1K","sub":"SOURCE NAME","dir":"up|down|flat"},"facts":[{"k":"LABEL","v":"VALUE","s":"ok|warn|bad"},{"k":"..","v":"..","s":"ok"},{"k":"..","v":"..","s":"warn"}],"lines":[{"who":"lotti","text":"..."},{"who":"bram","text":"..."},{"who":"lotti","text":"..."},{"who":"bram","text":"..."}]}]}`;
 
 /** OpenAI-compatible writer: one item per request, JSON in plain text (free models are unreliable at tool calls). */
-async function generateOpenAI(items, cfg, deps) {
+async function generateOpenAI(items, cfg, deps, feedback = {}) {
   const out = [];
   for (let n = 0; n < items.length; n++) {
     if (n > 0) await sleep(cfg.llmDelayMs);
@@ -73,7 +73,9 @@ async function generateOpenAI(items, cfg, deps) {
       max_tokens: 2500,
       messages: [
         { role: 'system', content: SYSTEM.replace(/by calling publish_stories/g, 'in the JSON reply') },
-        { role: 'user', content: buildUserMessage([item], deps.now()).replace(/by calling publish_stories\./, '') + '\n' + SHAPE },
+        { role: 'user', content: buildUserMessage([item], deps.now()).replace(/by calling publish_stories\./, '') + '\n' + (feedback[item.id]
+          ? `Your previous attempt for this item was rejected by an automatic checker: ${feedback[item.id].slice(0, 4).join('; ')}. Write it again and fix those problems. Use only numbers that appear in the item text, avoid any advice or hype wording, and keep every field within its length limit.\n`
+          : '') + SHAPE },
       ],
     };
     let text = null, lastErr;
@@ -120,11 +122,11 @@ async function generateOpenAI(items, cfg, deps) {
 }
 
 /** Ask Claude for one segment per item. The reply is forced through a tool so it is always structured. */
-export async function generateStories(items, cfg, deps) {
+export async function generateStories(items, cfg, deps, feedback = {}) {
   if (cfg.mockLlm) return mockStories(items);
   if (cfg.llmProvider === 'openai') {
     if (!writerReady(cfg)) throw new Error('LLM_API_KEY is not set (get a free key from OpenRouter or Google AI Studio, or set MOCK_LLM=1 to test)');
-    return generateOpenAI(items, cfg, deps);
+    return generateOpenAI(items, cfg, deps, feedback);
   }
   if (!cfg.anthropicKey) {
     throw new Error('ANTHROPIC_API_KEY is not set (or set MOCK_LLM=1 to test with template stories)');

@@ -48,3 +48,22 @@ test('free-model writer: a garbled reply skips that item, a 401 is fatal, a 429 
   assert.deepEqual(out.map((s) => s.itemId), ['b']);
   await assert.rejects(() => generateStories([item('a')], cfg, deps(async () => res({ error: { message: 'bad key' } }, 401))), /401.*bad key/);
 });
+
+import { buildStories } from '../src/builder.js';
+test('repair pass: a rejected story is re-asked with the reasons and can then air', async () => {
+  const cfg = { ...loadConfig({ LLM_API_KEY: 'k', LLM_DELAY_MS: '0' }), dataDir: '/tmp/x', maxStories: 5 };
+  const it = { ...item('a'), summary: 'Volume rose 40%.' };
+  let call = 0;
+  const bodies = [];
+  const fetchImpl = async (url, opts) => {
+    const b = JSON.parse(opts.body); bodies.push(b.messages[1].content);
+    const s = mockStories([it])[0];
+    if (call++ === 0) s.lines[1].text = 'Volume rose 4,400 percent, so you should buy now.';
+    return res({ choices: [{ message: { content: JSON.stringify({ stories: [s] }) } }] });
+  };
+  const out = await buildStories([it], cfg, deps(fetchImpl));
+  assert.equal(out.stories.length, 1);
+  assert.equal(out.rejected.length, 0);
+  assert.equal(call, 2);
+  assert.match(bodies[1], /rejected by an automatic checker/);
+});

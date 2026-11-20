@@ -147,7 +147,13 @@ export function createApp(cfg, deps = {}) {
         nextRun: nextRunAt ? new Date(nextRunAt).toISOString() : null,
         running,
         feeds: st.feedStatus,
-        lastCycle: lastSummary && { picked: lastSummary.picked, built: lastSummary.built, rejected: lastSummary.rejected.length },
+        lastCycle: lastSummary && {
+          picked: lastSummary.picked,
+          built: lastSummary.built,
+          rejected: lastSummary.rejected.length,
+          rejectedWhy: lastSummary.rejected.slice(0, 8).map((r) => ({ item: r.itemId, errors: r.errors.slice(0, 3) })),
+          errors: lastSummary.errors,
+        },
         writer: writerLabel(cfg),
         voices: ttsEnabled(cfg) ? 'openai' : 'browser',
       });

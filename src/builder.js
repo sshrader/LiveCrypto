@@ -35,28 +35,51 @@ function assemble(v, item, now) {
 }
 
 export async function buildStories(items, cfg, deps) {
-  const raw = await generateStories(items, cfg, deps);
   const byId = new Map(items.map((i) => [i.id, i]));
   const stories = [];
-  const rejected = [];
+  let rejected = [];
   const done = new Set();
-  for (const r of raw) {
-    const item = byId.get(r?.itemId);
-    if (!item || done.has(item.id)) {
-      rejected.push({ itemId: String(r?.itemId), errors: ['unknown or duplicate itemId'] });
-      continue;
+
+  async function process(raw) {
+    const bad = [];
+    for (const r of raw) {
+      const item = byId.get(r?.itemId);
+      if (!item || done.has(item.id)) {
+        bad.push({ itemId: String(r?.itemId), errors: ['unknown or duplicate itemId'] });
+        continue;
+      }
+      done.add(item.id);
+      const v = validateStory(r, item);
+      if (!v.ok) {
+        done.delete(item.id);
+        bad.push({ itemId: item.id, errors: v.errors });
+        continue;
+      }
+      stories.push(await attachAudio(assemble(v.story, item, deps.now()), cfg, deps));
     }
-    done.add(item.id);
-    const v = validateStory(r, item);
-    if (!v.ok) {
-      rejected.push({ itemId: item.id, errors: v.errors });
-      continue;
-    }
-    const story = assemble(v.story, item, deps.now());
-    stories.push(await attachAudio(story, cfg, deps));
+    return bad;
   }
+
+  rejected = await process(await generateStories(items, cfg, deps));
   for (const it of items) {
-    if (!done.has(it.id)) rejected.push({ itemId: it.id, errors: ['not returned by the model'] });
+    if (!done.has(it.id) && !rejected.some((r) => r.itemId === it.id)) rejected.push({ itemId: it.id, errors: ['not returned by the model'] });
+  }
+
+  // One repair pass for the real writers: show the model what was wrong and ask again.
+  const retry = rejected.filter((r) => byId.has(r.itemId) && !done.has(r.itemId));
+  if (retry.length && !cfg.mockLlm && cfg.llmProvider === 'openai') {
+    const fb = Object.fromEntries(retry.map((r) => [r.itemId, r.errors]));
+    try {
+      const again = await generateStories(retry.map((r) => byId.get(r.itemId)), cfg, deps, fb);
+      const still = await process(again);
+      rejected = rejected.filter((r) => !done.has(r.itemId)); // repaired ones leave the list
+      for (const st of still) {
+        const old = rejected.find((r) => r.itemId === st.itemId);
+        if (old) old.errors = st.errors.map((e) => 'retry: ' + e);
+      }
+    } catch (e) {
+      deps.log?.('repair pass failed:', e.message);
+    }
   }
   return { stories, rejected };
 }
