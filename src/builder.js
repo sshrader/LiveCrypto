@@ -60,9 +60,11 @@ export async function buildStories(items, cfg, deps) {
     return bad;
   }
 
-  rejected = await process(await generateStories(items, cfg, deps));
+  const first = await generateStories(items, cfg, deps);
+  const notes = { ...(first.notes || {}) };
+  rejected = await process(first);
   for (const it of items) {
-    if (!done.has(it.id) && !rejected.some((r) => r.itemId === it.id)) rejected.push({ itemId: it.id, errors: ['not returned by the model'] });
+    if (!done.has(it.id) && !rejected.some((r) => r.itemId === it.id)) rejected.push({ itemId: it.id, errors: [notes[it.id] || 'not returned by the model'] });
   }
 
   // One repair pass for the real writers: show the model what was wrong and ask again.
@@ -72,6 +74,10 @@ export async function buildStories(items, cfg, deps) {
     try {
       const again = await generateStories(retry.map((r) => byId.get(r.itemId)), cfg, deps, fb);
       const still = await process(again);
+      for (const [id, why] of Object.entries(again.notes || {})) {
+        const old = rejected.find((r) => r.itemId === id);
+        if (old && !done.has(id)) old.errors = ['retry: ' + why];
+      }
       rejected = rejected.filter((r) => !done.has(r.itemId)); // repaired ones leave the list
       for (const st of still) {
         const old = rejected.find((r) => r.itemId === st.itemId);

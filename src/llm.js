@@ -64,13 +64,14 @@ const SHAPE = `Reply with ONLY one JSON object, no markdown and no commentary, i
 /** OpenAI-compatible writer: one item per request, JSON in plain text (free models are unreliable at tool calls). */
 async function generateOpenAI(items, cfg, deps, feedback = {}) {
   const out = [];
+  out.notes = {};
   for (let n = 0; n < items.length; n++) {
     if (n > 0) await sleep(cfg.llmDelayMs);
     const item = items[n];
     const body = {
       model: cfg.llmModel,
       temperature: 0.6,
-      max_tokens: 2500,
+      max_tokens: 4000,
       messages: [
         { role: 'system', content: SYSTEM.replace(/by calling publish_stories/g, 'in the JSON reply') },
         { role: 'user', content: buildUserMessage([item], deps.now()).replace(/by calling publish_stories\./, '') + '\n' + (feedback[item.id]
@@ -78,7 +79,7 @@ async function generateOpenAI(items, cfg, deps, feedback = {}) {
           : '') + SHAPE },
       ],
     };
-    let text = null, lastErr;
+    let text = null, lastErr, finish = '';
     for (let attempt = 0; attempt < 2 && text === null; attempt++) {
       try {
         const res = await deps.fetchImpl(`${cfg.llmBase}/chat/completions`, {
@@ -103,6 +104,7 @@ async function generateOpenAI(items, cfg, deps, feedback = {}) {
           throw e;
         }
         text = data?.choices?.[0]?.message?.content ?? '';
+        finish = data?.choices?.[0]?.finish_reason || '';
         if (!text) throw Object.assign(new Error('empty reply'), { retry: true });
       } catch (e) {
         lastErr = e;
@@ -111,12 +113,18 @@ async function generateOpenAI(items, cfg, deps, feedback = {}) {
       }
     }
     if (text === null) {
+      out.notes[item.id] = `request failed: ${lastErr?.message}`;
       if (n === 0 && !out.length) throw lastErr; // nothing worked at all: treat as a writer outage, retry later
       break; // keep what we have; the rest retry next cycle
     }
     const json = extractJson(text);
     const story = Array.isArray(json?.stories) ? json.stories[0] : json && json.headline ? json : null;
     if (story) out.push({ ...story, itemId: item.id });
+    else {
+      const head = String(text).replace(/\s+/g, ' ').trim().slice(0, 140);
+      out.notes[item.id] = `reply was not usable JSON${finish ? ` (finish: ${finish})` : ''}: ${head}`;
+      deps.log?.('unusable writer reply for', item.id, head);
+    }
   }
   return out;
 }

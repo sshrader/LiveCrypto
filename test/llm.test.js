@@ -46,6 +46,7 @@ test('free-model writer: a garbled reply skips that item, a 401 is fatal, a 429 
   const garbled = async () => res({ choices: [{ message: { content: n++ === 0 ? 'I cannot do that' : JSON.stringify({ stories: mockStories([item('x')]) }) } }] });
   const out = await generateStories([item('a'), item('b')], cfg, deps(garbled));
   assert.deepEqual(out.map((s) => s.itemId), ['b']);
+  assert.match(out.notes.a, /not usable JSON: I cannot do that/);
   await assert.rejects(() => generateStories([item('a')], cfg, deps(async () => res({ error: { message: 'bad key' } }, 401))), /401.*bad key/);
 });
 
