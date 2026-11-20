@@ -1,0 +1,1350 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Gill & Horn Live</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  /* Layout: one 16:9 studio stage with HUD, headline banner and ticker laid over it;
+     controls and captions sit under the stage; source card and rundown sit beside it on wide screens. */
+  --ink: #0a1a22;
+  --panel: #10262f;
+  --panel-2: #163443;
+  --line: #25485a;
+  --text: #ece6d8;
+  --muted: #9fb6bc;
+  --coral: #f4a9bb;
+  --brass: #dba944;
+  --signal: #d93b25;
+  --ok: #5cc58f;
+  --warn: #e9b23e;
+  --bad: #ec6a52;
+  --wall-top: #14343f;
+  --wall-bot: #0b1d25;
+  --trend: #5cc58f;
+  --f-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --f-body: 'Barlow', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --f-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--ink);
+  color: var(--text);
+  font: 400 16px/1.5 var(--f-body);
+}
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-inline: 16px;
+  padding-block: 20px 40px;
+}
+
+/* Header */
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px 20px;
+  margin-bottom: 16px;
+}
+.mark { min-width: 0; }
+.mark-name {
+  display: block;
+  font: 700 clamp(30px, 6vw, 44px)/1 var(--f-display);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--coral);
+}
+.mark-sub {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 15px;
+}
+.flags { display: flex; flex-wrap: wrap; gap: 8px; }
+.flag {
+  font: 500 12px/1 var(--f-mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  border-radius: 4px;
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+@media (min-width: 980px) {
+  .grid { grid-template-columns: minmax(0, 1fr) 330px; align-items: start; }
+}
+.main { min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+
+/* Stage */
+.stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--wall-bot);
+  border: 1px solid var(--line);
+  container-type: inline-size;
+}
+.stage > svg { display: block; width: 100%; height: 100%; }
+
+.hud {
+  position: absolute;
+  top: 2.2%;
+  left: 2.2%;
+  right: 2.2%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font: 500 clamp(9px, 1.5cqw, 15px)/1 var(--f-mono);
+  letter-spacing: .08em;
+  pointer-events: none;
+}
+.onair, .clock {
+  display: inline-flex;
+  align-items: center;
+  gap: .6em;
+  padding: .55em .8em;
+  background: rgba(10, 26, 34, .82);
+  border-radius: 3px;
+  color: var(--text);
+}
+.onair i {
+  width: .8em;
+  height: .8em;
+  border-radius: 50%;
+  background: #6c8189;
+}
+.stage[data-live="on"] .onair i {
+  background: var(--signal);
+  animation: pulse 1.3s ease-in-out infinite;
+}
+.stage[data-live="on"] .onair b { color: #ff9b88; }
+@keyframes pulse { 50% { opacity: .35; } }
+
+.banner {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 9%;
+  height: 11%;
+  display: flex;
+  align-items: stretch;
+  background: rgba(10, 26, 34, .93);
+  border-top: 2px solid var(--brass);
+  container-type: inline-size;
+}
+.banner .tag {
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding-inline: 2.4cqw;
+  font: 700 clamp(10px, 2.6cqw, 28px)/1 var(--f-display);
+  letter-spacing: .1em;
+  background: var(--brass);
+  color: #1b1405;
+}
+.banner[data-kind="breaking"] .tag { background: var(--signal); color: #fff; }
+.banner[data-kind="desk"] .tag { background: #3d7f95; color: #fff; }
+.banner .head {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  padding-inline: 2.4cqw;
+  font: 600 clamp(11px, 2.5cqw, 28px)/1 var(--f-display);
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.banner .head span { overflow: hidden; text-overflow: ellipsis; }
+
+.ticker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 9%;
+  display: flex;
+  background: #07131a;
+  font: 500 clamp(9px, 1.7cqw, 18px)/1 var(--f-mono);
+  letter-spacing: .02em;
+}
+.ticker-label {
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding-inline: 1.8cqw;
+  background: var(--brass);
+  color: #1b1405;
+  font-weight: 500;
+  letter-spacing: .08em;
+}
+.ticker-view { flex: 1; min-width: 0; overflow: hidden; display: flex; align-items: center; }
+.ticker-track {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: crawl 95s linear infinite;
+  will-change: transform;
+}
+.ticker-track span { padding-inline: 1.4em; }
+.ticker-track .sep { color: var(--brass); padding-inline: .4em; }
+@keyframes crawl { to { transform: translateX(-50%); } }
+
+/* Scene styling */
+.f-display { font-family: var(--f-display); }
+.f-mono { font-family: var(--f-mono); }
+.plate rect { fill: #1b2e38; stroke: #3b5563; stroke-width: 2; }
+.plate text { fill: var(--text); }
+.plate.speaking rect { stroke: var(--brass); }
+.bob { transform-box: fill-box; transform-origin: 50% 100%; }
+.anchor.speaking .bob { animation: bob .5s ease-in-out infinite alternate; }
+@keyframes bob {
+  from { transform: translateY(0) rotate(-.4deg); }
+  to { transform: translateY(-3px) rotate(.4deg); }
+}
+.blink {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blink 5s infinite;
+}
+.blink.b2 { animation-delay: -2.2s; }
+@keyframes blink {
+  0%, 93%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(.08); }
+}
+.dot.ok { fill: var(--ok); }
+.dot.warn { fill: var(--warn); }
+.dot.bad { fill: var(--bad); }
+
+/* Controls */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+.btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: 600 15px/1 var(--f-body);
+  padding: 12px 18px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text);
+  cursor: pointer;
+}
+.btn:hover { background: #1c4152; }
+.btn.primary {
+  background: var(--signal);
+  border-color: var(--signal);
+  color: #fff;
+  letter-spacing: .02em;
+}
+.btn.primary:hover { background: #c33320; }
+.btn .rec { width: 10px; height: 10px; border-radius: 50%; background: #fff; }
+.btn.primary[data-on="true"] .rec { border-radius: 2px; }
+.btn:focus-visible, select:focus-visible, input:focus-visible, .rd:focus-visible {
+  outline: 3px solid var(--brass);
+  outline-offset: 2px;
+}
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  cursor: pointer;
+}
+.check input { width: 18px; height: 18px; accent-color: var(--brass); }
+.voices { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+.sel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 500 12px/1 var(--f-mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.voices[hidden], #ttsNote[hidden] { display: none; }
+.voices label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 500 12px/1 var(--f-mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+select {
+  max-width: 190px;
+  font: 400 14px/1.2 var(--f-body);
+  padding: 8px 10px;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+
+/* Caption */
+.caption {
+  margin: 0;
+  min-height: 5.6em;
+  padding: 14px 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 19px;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+.caption .who {
+  display: block;
+  margin-bottom: 4px;
+  font: 500 12px/1 var(--f-mono);
+  letter-spacing: .12em;
+}
+.caption .who.lotti { color: var(--coral); }
+.caption .who.bram { color: #9db4d6; }
+.caption .who.desk { color: var(--brass); }
+.caption mark { background: rgba(219, 169, 68, .32); color: inherit; border-radius: 3px; padding: 0 2px; }
+.note { margin: 0; color: var(--muted); font-size: 14px; }
+
+/* Side cards */
+.side { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  min-width: 0;
+}
+.card h2 {
+  margin: 0 0 12px;
+  font: 500 12px/1 var(--f-mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.src-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 10px; }
+.handle { font: 500 15px/1.2 var(--f-mono); color: var(--text); overflow-wrap: anywhere; }
+.chip {
+  font: 500 11px/1 var(--f-mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 5px 7px;
+  border-radius: 3px;
+  background: rgba(233, 178, 62, .16);
+  color: var(--warn);
+}
+.post { margin: 0 0 8px; font-size: 16px; line-height: 1.45; overflow-wrap: anywhere; }
+.age { margin: 0 0 14px; font: 400 12px/1 var(--f-mono); color: var(--muted); }
+.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.checks li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--panel-2);
+  border-radius: 4px;
+  font: 500 13px/1.2 var(--f-mono);
+}
+.checks .k { color: var(--muted); letter-spacing: .04em; }
+.checks .v { display: inline-flex; align-items: center; gap: 8px; text-align: right; }
+.checks .v i { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.checks .ok i { background: var(--ok); }
+.checks .warn i { background: var(--warn); }
+.checks .bad i { background: var(--bad); }
+
+#rundown { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.rd {
+  appearance: none;
+  width: 100%;
+  text-align: left;
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text);
+  font: 500 15px/1.3 var(--f-body);
+  cursor: pointer;
+}
+.rd:hover { background: var(--panel-2); }
+.rd[aria-current="true"] { background: var(--panel-2); border-color: var(--line); }
+.rd .rt {
+  font: 500 11px/1 var(--f-mono);
+  letter-spacing: .1em;
+  color: var(--muted);
+  display: flex;
+  gap: 10px;
+}
+.rd[aria-current="true"] .rt b { color: var(--brass); font-weight: 500; }
+
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.links { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+.links .lk {
+  font: 500 11px/1 var(--f-mono);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.links a {
+  color: var(--brass);
+  font: 500 14px/1.35 var(--f-body);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+.links a:focus-visible { outline: 3px solid var(--brass); outline-offset: 2px; }
+
+/* Footer */
+.foot {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px 28px;
+}
+@media (min-width: 820px) { .foot { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); } }
+.foot h2 {
+  margin: 0 0 10px;
+  font: 700 22px/1.1 var(--f-display);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.foot ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; color: var(--muted); }
+.foot li { padding-left: 2px; }
+.foot p { margin: 0; color: var(--muted); max-width: 62ch; }
+.foot code {
+  font: 400 13px/1 var(--f-mono);
+  background: var(--panel-2);
+  padding: 2px 5px;
+  border-radius: 3px;
+  color: var(--text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track, .blink, .anchor.speaking .bob, .stage[data-live="on"] .onair i { animation: none; }
+}
+</style>
+
+<main class="wrap">
+  <header class="top">
+    <div class="mark">
+      <span class="mark-name">Gill &amp; Horn</span>
+      <span class="mark-sub">Two anchors, one desk, headlines pulled live with sources.</span>
+    </div>
+    <div class="flags">
+      <span class="flag" id="asOf">Connecting to the feed...</span>
+      <span class="flag">Not financial advice</span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <section class="main" aria-label="Studio">
+      <div class="stage" id="stage" data-live="off">
+        <svg id="scene" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="An axolotl anchor and an ox anchor sitting behind a news desk">
+          <defs>
+            <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" style="stop-color: var(--wall-top)"/>
+              <stop offset="1" style="stop-color: var(--wall-bot)"/>
+            </linearGradient>
+            <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+              <stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/>
+              <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="deskTop" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#94694a"/>
+              <stop offset="1" stop-color="#5c3f27"/>
+            </linearGradient>
+            <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" style="stop-color: var(--trend)" stop-opacity="0.38"/>
+              <stop offset="1" style="stop-color: var(--trend)" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Back wall -->
+          <rect x="0" y="0" width="1280" height="720" fill="url(#wall)"/>
+          <g id="skylineL"></g>
+          <g id="skylineR"></g>
+          <circle cx="440" cy="400" r="260" fill="url(#glow)"/>
+          <circle cx="850" cy="400" r="260" fill="url(#glow)"/>
+
+          <!-- Neon sign -->
+          <rect x="30" y="56" width="340" height="164" rx="10" fill="#0a1a22" stroke="#f4a9bb" stroke-width="3"/>
+          <text x="200" y="134" text-anchor="middle" class="f-display" font-size="64" font-weight="700" textLength="290" lengthAdjust="spacingAndGlyphs" fill="#f4a9bb">GILL &amp; HORN</text>
+          <text x="200" y="168" text-anchor="middle" class="f-mono" font-size="15" textLength="250" lengthAdjust="spacing" fill="#dba944">LIVE &#183; MEMES &amp; MARKETS</text>
+          <rect x="70" y="186" width="260" height="3" rx="1.5" fill="#dba944"/>
+
+          <!-- Key figure monitor -->
+          <rect x="400" y="56" width="480" height="164" rx="10" fill="#08151c" stroke="#25485a" stroke-width="3"/>
+          <text id="statLabel" x="424" y="90" class="f-mono" font-size="17" letter-spacing="3" fill="#9fb6bc">BTC</text>
+          <polygon id="statArrow" points="832,92 858,92 845,72" fill="#5cc58f" opacity="0"/>
+          <text id="statValue" x="640" y="166" text-anchor="middle" class="f-display" font-size="92" font-weight="700" letter-spacing="1" fill="#ece6d8">$83.1K</text>
+          <text id="statSub" x="640" y="200" text-anchor="middle" class="f-mono" font-size="14" letter-spacing="1.5" fill="#9fb6bc">-</text>
+
+          <!-- Checks panel -->
+          <rect x="910" y="56" width="340" height="164" rx="10" fill="#08151c" stroke="#25485a" stroke-width="3"/>
+          <text x="934" y="84" class="f-mono" font-size="14" letter-spacing="2" fill="#9fb6bc">KEY FACTS</text>
+          <line x1="934" y1="96" x2="1226" y2="96" stroke="#25485a" stroke-width="1"/>
+          <g class="f-mono" font-size="16" fill="#ece6d8">
+            <text id="ck0k" x="934" y="126" fill="#9fb6bc">LIQUIDITY</text>
+            <text id="ck0v" x="1186" y="126" text-anchor="end">-</text>
+            <circle id="ck0d" class="dot ok" cx="1210" cy="121" r="8" fill="#5cc58f"/>
+            <text id="ck1k" x="934" y="162" fill="#9fb6bc">TOKEN AGE</text>
+            <text id="ck1v" x="1186" y="162" text-anchor="end">-</text>
+            <circle id="ck1d" class="dot ok" cx="1210" cy="157" r="8" fill="#5cc58f"/>
+            <text id="ck2k" x="934" y="198" fill="#9fb6bc">TOP 10 HOLD</text>
+            <text id="ck2v" x="1186" y="198" text-anchor="end">-</text>
+            <circle id="ck2d" class="dot ok" cx="1210" cy="193" r="8" fill="#5cc58f"/>
+          </g>
+
+          <!-- Lotti, the axolotl -->
+          <g id="lotti" class="anchor">
+            <g class="bob">
+              <rect x="345" y="462" width="190" height="150" rx="46" fill="#dba944"/>
+              <path d="M415 462 L440 524 L465 462 Z" fill="#f6efe2"/>
+              <path d="M415 462 L392 472 L430 548 L440 524 Z" fill="#b8862b"/>
+              <path d="M465 462 L488 472 L450 548 L440 524 Z" fill="#b8862b"/>
+              <circle cx="486" cy="500" r="7" fill="#f6efe2"/>
+              <!-- gills behind the head -->
+              <g fill="#e8607f">
+                <ellipse cx="318" cy="318" rx="58" ry="13" transform="rotate(-28 318 318)"/>
+                <ellipse cx="304" cy="362" rx="62" ry="13" transform="rotate(2 304 362)"/>
+                <ellipse cx="318" cy="406" rx="56" ry="13" transform="rotate(28 318 406)"/>
+                <ellipse cx="562" cy="318" rx="58" ry="13" transform="rotate(28 562 318)"/>
+                <ellipse cx="576" cy="362" rx="62" ry="13" transform="rotate(-2 576 362)"/>
+                <ellipse cx="562" cy="406" rx="56" ry="13" transform="rotate(-28 562 406)"/>
+              </g>
+              <g fill="#f08aa4">
+                <circle cx="266" cy="296" r="9"/>
+                <circle cx="248" cy="362" r="9"/>
+                <circle cx="268" cy="428" r="9"/>
+                <circle cx="614" cy="296" r="9"/>
+                <circle cx="632" cy="362" r="9"/>
+                <circle cx="612" cy="428" r="9"/>
+              </g>
+              <ellipse cx="440" cy="360" rx="120" ry="96" fill="#f6b3c3"/>
+              <ellipse cx="402" cy="310" rx="52" ry="22" fill="#ffffff" opacity="0.14"/>
+              <ellipse cx="372" cy="374" rx="18" ry="10" fill="#ee7b97" opacity="0.6"/>
+              <ellipse cx="508" cy="374" rx="18" ry="10" fill="#ee7b97" opacity="0.6"/>
+              <g class="blink">
+                <circle cx="395" cy="336" r="16" fill="#2a1722"/>
+                <circle cx="401" cy="330" r="5.5" fill="#ffffff"/>
+              </g>
+              <g class="blink b2">
+                <circle cx="485" cy="336" r="16" fill="#2a1722"/>
+                <circle cx="491" cy="330" r="5.5" fill="#ffffff"/>
+              </g>
+              <path d="M398 384 Q440 414 482 384" fill="none" stroke="#7a2c46" stroke-width="5" stroke-linecap="round"/>
+              <ellipse id="lottiMouth" cx="440" cy="396" rx="30" ry="3" fill="#5a1f33"/>
+              <ellipse id="lottiTongue" cx="440" cy="404" rx="15" ry="5" fill="#e8607f" opacity="0"/>
+            </g>
+          </g>
+
+          <!-- Bram, the ox -->
+          <g id="bram" class="anchor">
+            <g class="bob">
+              <rect x="735" y="466" width="230" height="150" rx="52" fill="#1d2c44"/>
+              <path d="M815 466 L850 542 L885 466 Z" fill="#f6efe2"/>
+              <path d="M815 466 L790 478 L838 578 L850 542 Z" fill="#162236"/>
+              <path d="M885 466 L910 478 L862 578 L850 542 Z" fill="#162236"/>
+              <path d="M841 496 L859 496 L865 560 L850 576 L835 560 Z" fill="#b8462b"/>
+              <path d="M837 478 L863 478 L859 498 L841 498 Z" fill="#9a3a23"/>
+              <path d="M912 500 L934 496 L934 512 L912 514 Z" fill="#dba944"/>
+              <path d="M790 292 C746 290 722 276 724 250" fill="none" stroke="#eadfc4" stroke-width="20" stroke-linecap="round"/>
+              <path d="M910 292 C954 290 978 276 976 250" fill="none" stroke="#eadfc4" stroke-width="20" stroke-linecap="round"/>
+              <ellipse cx="756" cy="338" rx="34" ry="16" transform="rotate(18 756 338)" fill="#5d6b80"/>
+              <ellipse cx="944" cy="338" rx="34" ry="16" transform="rotate(-18 944 338)" fill="#5d6b80"/>
+              <rect x="770" y="268" width="160" height="190" rx="62" fill="#71809a"/>
+              <path d="M806 272 Q850 236 894 272 Q850 290 806 272 Z" fill="#3f4a5e"/>
+              <ellipse cx="850" cy="414" rx="72" ry="46" fill="#cdbba0"/>
+              <ellipse cx="826" cy="396" rx="7" ry="10" fill="#6b5a45"/>
+              <ellipse cx="874" cy="396" rx="7" ry="10" fill="#6b5a45"/>
+              <circle cx="850" cy="410" r="9" fill="none" stroke="#dba944" stroke-width="4"/>
+              <path d="M790 318 L832 326" fill="none" stroke="#2f394b" stroke-width="9" stroke-linecap="round"/>
+              <path d="M910 318 L868 326" fill="none" stroke="#2f394b" stroke-width="9" stroke-linecap="round"/>
+              <g class="blink">
+                <ellipse cx="812" cy="342" rx="11" ry="9" fill="#101820"/>
+                <circle cx="816" cy="339" r="3" fill="#ffffff"/>
+              </g>
+              <g class="blink b2">
+                <ellipse cx="888" cy="342" rx="11" ry="9" fill="#101820"/>
+                <circle cx="892" cy="339" r="3" fill="#ffffff"/>
+              </g>
+              <ellipse id="bramMouth" cx="850" cy="438" rx="24" ry="3" fill="#3a2a22"/>
+            </g>
+          </g>
+
+          <!-- Desk -->
+          <rect x="0" y="528" width="1280" height="52" fill="url(#deskTop)"/>
+          <rect x="0" y="528" width="1280" height="3" fill="#b9936d"/>
+          <rect x="0" y="578" width="1280" height="142" fill="#35241a"/>
+          <rect x="0" y="578" width="1280" height="5" fill="#dba944"/>
+          <g class="plate" id="plateLotti">
+            <rect x="355" y="540" width="170" height="30" rx="4"/>
+            <text x="440" y="562" text-anchor="middle" class="f-display" font-size="19" font-weight="700" letter-spacing="2.5">LOTTI FROND</text>
+          </g>
+          <g class="plate" id="plateBram">
+            <rect x="765" y="540" width="170" height="30" rx="4"/>
+            <text x="850" y="562" text-anchor="middle" class="f-display" font-size="19" font-weight="700" letter-spacing="2.5">BRAM OXLEY</text>
+          </g>
+          <!-- Mugs -->
+          <rect x="570" y="506" width="26" height="24" rx="4" fill="#f6efe2"/>
+          <path d="M596 512 q11 4 0 14" fill="none" stroke="#f6efe2" stroke-width="4"/>
+          <rect x="690" y="506" width="26" height="24" rx="4" fill="#dba944"/>
+          <path d="M716 512 q11 4 0 14" fill="none" stroke="#dba944" stroke-width="4"/>
+        </svg>
+
+        <div class="hud">
+          <span class="onair"><i></i><b id="liveText">OFF AIR</b></span>
+          <span class="clock" id="clock">--:--</span>
+        </div>
+
+        <div class="banner" id="banner" data-kind="trending">
+          <div class="tag" id="bTag">TRENDING</div>
+          <div class="head"><span id="bHead"></span></div>
+        </div>
+
+        <div class="ticker" aria-hidden="true">
+          <div class="ticker-label">NEWS</div>
+          <div class="ticker-view"><div class="ticker-track" id="tickerTrack"></div></div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="goBtn" class="btn primary" type="button" data-on="false" disabled><span class="rec"></span><span id="goLabel">Go live</span></button>
+        <button id="nextBtn" class="btn" type="button" disabled>Next story</button>
+        <label class="check" for="voiceOn"><input type="checkbox" id="voiceOn" checked> Voices on</label>
+        <label class="sel" for="voiceMode">Voice set <select id="voiceMode"><option value="browser">Browser voices</option></select></label>
+        <div class="voices" id="voiceBox" hidden>
+          <label for="voiceLotti">Lotti <select id="voiceLotti"></select></label>
+          <label for="voiceBram">Bram <select id="voiceBram"></select></label>
+        </div>
+      </div>
+
+      <p class="caption" id="caption" aria-live="polite"></p>
+      <p class="note" id="ttsNote" hidden></p>
+    </section>
+
+    <aside class="side">
+      <section class="card" aria-label="Source on screen">
+        <h2>On screen now</h2>
+        <div class="src-top">
+          <span class="handle" id="srcHandle"></span>
+          <span class="chip" id="srcFlag"></span>
+        </div>
+        <p class="post" id="srcPost"></p>
+        <p class="age" id="srcAge"></p>
+        <ul class="checks" id="srcChecks"></ul>
+        <div class="links" id="srcLinks"></div>
+      </section>
+      <section class="card" aria-label="Rundown">
+        <h2>Rundown</h2>
+        <ul id="rundown"></ul>
+      </section>
+    </aside>
+  </div>
+
+  <footer class="foot">
+    <div>
+      <h2>How this rundown was made</h2>
+      <ul>
+        <li>A small server reads news feeds and DexScreener every few minutes, drops duplicates and old items, and has Claude write a short segment for each new one. Every segment links to its source and shows when it was published.</li>
+        <li>Numbers in a segment are checked against the source text before it can air, and the market stats are filled in by code rather than by the writer. Segments that fail the check are thrown away.</li>
+        <li>This page asks the server for new segments every 30 seconds and airs the unseen ones first. Studio voices appear when the server has an AI voice key; otherwise your browser voices read the script.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Read this first</h2>
+      <p>Segments are written by an AI from news summaries and market data, and can still be wrong or out of date. Numbers are as reported at the time shown, not live prices. DexScreener boosts are paid promotion, not a recommendation. Always open the source. Nothing here is financial advice.</p>
+    </div>
+  </footer>
+</main>
+
+
+<script>
+(function () {
+  'use strict';
+
+  function $(id) { return document.getElementById(id); }
+  function rng(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  /* Stories load from stories.json (see the loader at the bottom). */
+  var SEGMENTS = [];
+
+  var ANCHORS = {
+    lotti: { name: 'Lotti Frond', pitch: 1.45, rate: 1.08, prefer: /female|samantha|zira|aria|jenny|karen|moira|susan|hazel|google uk english female/i },
+    bram:  { name: 'Bram Oxley', pitch: 0.55, rate: 0.92, prefer: /\bmale\b|daniel|david|guy|alex|fred|mark|google uk english male|george/i }
+  };
+
+  var state = { index: 0, lastId: null, running: false, runId: 0, cancelLine: null, ttsBroken: false, studioBroken: false };
+  var talking = null;
+  var aired = {};
+  var pulseUntil = 0;
+
+  /* ------------------------- Scene setup ------------------------- */
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  function el(name, attrs) {
+    var n = document.createElementNS(SVGNS, name);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    return n;
+  }
+  function buildSkyline(g, x0, x1, seed) {
+    var r = rng(seed), x = x0;
+    while (x < x1) {
+      var w = 30 + Math.floor(r() * 30);
+      if (x + w > x1) w = x1 - x;
+      var h = 90 + Math.floor(r() * 150);
+      var top = 528 - h;
+      g.appendChild(el('rect', { x: x, y: top, width: w, height: h, fill: '#0f2a35' }));
+      for (var wy = top + 14; wy < 510; wy += 19) {
+        for (var wx = x + 7; wx < x + w - 9; wx += 13) {
+          if (r() > 0.58) {
+            g.appendChild(el('rect', { x: wx, y: wy, width: 6, height: 8, fill: '#f1d98a', opacity: (0.35 + r() * 0.4).toFixed(2) }));
+          }
+        }
+      }
+      x += w + 4;
+    }
+  }
+  buildSkyline($('skylineL'), 20, 400, 5);
+  buildSkyline($('skylineR'), 880, 1270, 9);
+
+  /* ------------------------- Key figure monitor ------------------------- */
+  function drawStat(s) {
+    var st = s.stat || { label: '', value: '', sub: '', dir: 'flat' };
+    var v = String(st.value);
+    var col = st.dir === 'up' ? '#5cc58f' : st.dir === 'down' ? '#ec6a52' : '#ece6d8';
+    $('statLabel').textContent = st.label;
+    var val = $('statValue');
+    val.textContent = v;
+    val.setAttribute('font-size', String(Math.max(44, Math.min(96, Math.floor(430 / (Math.max(v.length, 1) * 0.46))))));
+    val.setAttribute('fill', col);
+    $('statSub').textContent = st.sub;
+    var a = $('statArrow');
+    if (st.dir === 'up') {
+      a.setAttribute('points', '832,92 858,92 845,72');
+      a.setAttribute('fill', col);
+      a.setAttribute('opacity', '1');
+    } else if (st.dir === 'down') {
+      a.setAttribute('points', '832,72 858,72 845,92');
+      a.setAttribute('fill', col);
+      a.setAttribute('opacity', '1');
+    } else {
+      a.setAttribute('opacity', '0');
+    }
+  }
+
+  /* ------------------------- Segment display ------------------------- */
+  var rundown = $('rundown');
+  function buildRundown() {
+    rundown.textContent = '';
+    SEGMENTS.forEach(function (s, i) {
+      var li = document.createElement('li');
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'rd';
+      b.innerHTML = '<span class="rt"><span></span><b></b></span><span class="rh"></span>';
+      b.querySelector('.rt span').textContent = s.tag;
+      b.querySelector('.rh').textContent = s.headline;
+      b.addEventListener('click', function () { jump(i); });
+      li.appendChild(b);
+      rundown.appendChild(li);
+    });
+  }
+
+  function ageText(src) {
+    var t = Date.parse(src.publishedAt || '');
+    if (!isFinite(t)) return src.date ? 'Published ' + src.date : '';
+    var m = Math.round((Date.now() - t) / 60000);
+    var rel = m < 2 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' hr ago' : Math.round(m / 1440) + ' days ago';
+    return 'Published ' + rel + (src.date ? ' (' + src.date + ')' : '');
+  }
+  function safeUrl(u) { return typeof u === 'string' && /^https?:\/\//i.test(u); }
+  function addLink(box, text, url) {
+    if (!safeUrl(url)) return;
+    var a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.textContent = text;
+    box.appendChild(a);
+  }
+
+  function setSegment(i) {
+    var s = SEGMENTS[i];
+    $('banner').setAttribute('data-kind', s.kind);
+    $('bTag').textContent = s.tag;
+    $('bHead').textContent = s.headline;
+    drawStat(s);
+
+    s.facts.forEach(function (c, n) {
+      $('ck' + n + 'k').textContent = c.k;
+      $('ck' + n + 'v').textContent = c.v;
+      $('ck' + n + 'd').setAttribute('class', 'dot ' + c.s);
+    });
+
+    $('srcHandle').textContent = s.source.outlet;
+    $('srcFlag').textContent = s.source.flag || '';
+    $('srcPost').textContent = s.source.summary;
+    $('srcAge').textContent = ageText(s.source);
+
+    var ul = $('srcChecks');
+    ul.textContent = '';
+    s.facts.forEach(function (c) {
+      var li = document.createElement('li');
+      li.className = c.s;
+      var k = document.createElement('span'); k.className = 'k'; k.textContent = c.k;
+      var v = document.createElement('span'); v.className = 'v';
+      var vt = document.createElement('span'); vt.textContent = c.v;
+      var dot = document.createElement('i');
+      v.appendChild(vt); v.appendChild(dot);
+      li.appendChild(k); li.appendChild(v);
+      ul.appendChild(li);
+    });
+
+    var box = $('srcLinks');
+    box.textContent = '';
+    var hasLinks = safeUrl(s.source.url) || (s.also || []).some(function (x) { return safeUrl(x.url); });
+    if (hasLinks) {
+      var lab = document.createElement('span');
+      lab.className = 'lk';
+      lab.textContent = 'Sources';
+      box.appendChild(lab);
+      addLink(box, 'Read at ' + s.source.outlet, s.source.url);
+      (s.also || []).forEach(function (x) { addLink(box, x.outlet, x.url); });
+    }
+
+    var btns = rundown.querySelectorAll('.rd');
+    for (var n = 0; n < btns.length; n++) {
+      if (n === i) btns[n].setAttribute('aria-current', 'true');
+      else btns[n].removeAttribute('aria-current');
+      btns[n].querySelector('.rt b').textContent = n === i && state.running ? 'ON AIR' : '';
+    }
+  }
+
+  function buildTicker() {
+    var parts = SEGMENTS.map(function (s) {
+      var st = s.stat ? '  |  ' + s.stat.label + ' ' + s.stat.value : '';
+      return '<span>' + escapeHtml(s.tag + ': ' + s.headline + st) + '</span>';
+    });
+    parts.push('<span>NOT FINANCIAL ADVICE. NUMBERS ARE AS REPORTED ON THE DATES SHOWN. CHECK EACH SOURCE.</span>');
+    var chars = 0;
+    parts.forEach(function (x) { chars += x.length; });
+    var one = parts.join('<span class="sep">&#9670;</span>') + '<span class="sep">&#9670;</span>';
+    var track = $('tickerTrack');
+    track.innerHTML = one + one;
+    track.style.animationDuration = Math.max(60, Math.round(chars * 0.14)) + 's';
+  }
+  function escapeHtml(t) {
+    return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
+  }
+
+  /* ------------------------- Captions and speaker ------------------------- */
+  function showCaption(key, text, idx, len) {
+    var cap = $('caption');
+    cap.textContent = '';
+    var who = document.createElement('span');
+    who.className = 'who ' + key;
+    who.textContent = key === 'desk' ? 'DESK' : ANCHORS[key].name.toUpperCase();
+    var body = document.createElement('span');
+    if (typeof idx !== 'number' || idx < 0 || idx >= text.length) {
+      body.textContent = text;
+    } else {
+      var end = idx + (len || 0);
+      if (!len) {
+        var m = /\s|$/.exec(text.slice(idx));
+        end = idx + (m ? m.index : text.length - idx);
+      }
+      body.appendChild(document.createTextNode(text.slice(0, idx)));
+      var mk = document.createElement('mark');
+      mk.textContent = text.slice(idx, end);
+      body.appendChild(mk);
+      body.appendChild(document.createTextNode(text.slice(end)));
+    }
+    cap.appendChild(who);
+    cap.appendChild(body);
+  }
+  function idleCaption() {
+    showCaption('desk', 'Press Go live to start the show. Browsers only play sound after you click, so the anchors wait for you.');
+  }
+  function setSpeaker(key) {
+    $('lotti').classList.toggle('speaking', key === 'lotti');
+    $('bram').classList.toggle('speaking', key === 'bram');
+    $('plateLotti').classList.toggle('speaking', key === 'lotti');
+    $('plateBram').classList.toggle('speaking', key === 'bram');
+  }
+
+  /* ------------------------- Mouths ------------------------- */
+  var mouths = {
+    lotti: { el: $('lottiMouth'), tongue: $('lottiTongue'), min: 3, max: 24, cy: 396, cur: 0, ph: 0 },
+    bram:  { el: $('bramMouth'), tongue: null, min: 3, max: 17, cy: 438, cur: 0, ph: 1.3 }
+  };
+  var studio = { available: false, ctx: null, analyser: null, gain: null, buf: null, cache: {}, playing: false };
+  function readLevel() {
+    if (!studio.playing || !studio.analyser) return -1;
+    studio.analyser.getByteTimeDomainData(studio.buf);
+    var s = 0, i;
+    for (i = 0; i < studio.buf.length; i++) { var v = (studio.buf[i] - 128) / 128; s += v * v; }
+    return Math.min(1, Math.sqrt(s / studio.buf.length) * 5);
+  }
+  function frame(t) {
+    var lv = readLevel();
+    Object.keys(mouths).forEach(function (k) {
+      var m = mouths[k], open = 0;
+      if (talking === k) {
+        if (lv >= 0) {
+          open = Math.min(1, lv * 1.3);
+        } else {
+          var wob = 0.5 + 0.5 * Math.sin(t / 430 + m.ph);
+          open = 0.2 + 0.8 * Math.abs(Math.sin(t / 88 + m.ph)) * (0.55 + 0.45 * wob);
+          if (t < pulseUntil) open = Math.min(1, open * 1.15 + 0.1);
+        }
+      }
+      m.cur += (open - m.cur) * 0.45;
+      var ry = m.min + m.cur * (m.max - m.min);
+      m.el.setAttribute('ry', ry.toFixed(1));
+      m.el.setAttribute('cy', (m.cy + ry * 0.35).toFixed(1));
+      if (m.tongue) {
+        m.tongue.setAttribute('cy', (m.cy + ry * 0.9).toFixed(1));
+        m.tongue.setAttribute('ry', (ry * 0.35).toFixed(1));
+        m.tongue.setAttribute('opacity', m.cur > 0.3 ? '1' : '0');
+      }
+    });
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  /* ------------------------- Voices ------------------------- */
+  var hasTTS = 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance === 'function';
+  var voices = [];
+
+  function loadVoices() {
+    if (!hasTTS) return;
+    var all = speechSynthesis.getVoices() || [];
+    voices = all.filter(function (v) { return /^en/i.test(v.lang); });
+    if (!voices.length) voices = all;
+    if (!voices.length) return;
+    fillSelect($('voiceLotti'), 'lotti');
+    fillSelect($('voiceBram'), 'bram');
+    $('voiceBox').hidden = $('voiceMode').value !== 'browser';
+  }
+  function fillSelect(sel, key) {
+    var prev = sel.value;
+    sel.textContent = '';
+    var auto = document.createElement('option');
+    auto.value = '';
+    auto.textContent = 'Auto';
+    sel.appendChild(auto);
+    voices.forEach(function (v, i) {
+      var o = document.createElement('option');
+      o.value = String(i);
+      o.textContent = v.name + ' (' + v.lang + ')';
+      sel.appendChild(o);
+    });
+    if (prev) sel.value = prev;
+  }
+  function chosenVoice(key) {
+    if (!voices.length) return null;
+    var sel = $(key === 'lotti' ? 'voiceLotti' : 'voiceBram');
+    if (sel.value !== '') return voices[parseInt(sel.value, 10)] || null;
+    var pref = ANCHORS[key].prefer;
+    for (var i = 0; i < voices.length; i++) if (pref.test(voices[i].name)) return voices[i];
+    return voices[key === 'lotti' ? 0 : Math.min(1, voices.length - 1)];
+  }
+  if (hasTTS) {
+    loadVoices();
+    if (typeof speechSynthesis.addEventListener === 'function') speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    else speechSynthesis.onvoiceschanged = loadVoices;
+  } else {
+    $('ttsNote').hidden = false;
+    $('ttsNote').textContent = 'This browser has no speech voices, so captions and mouths run on a timer.';
+  }
+
+  /* ------------------------- Studio voices (pre-recorded clips) ------------------------- */
+  function ensureAudio() {
+    if (studio.ctx) {
+      if (studio.ctx.state === 'suspended' && studio.ctx.resume) { try { studio.ctx.resume(); } catch (e) {} }
+      return !!studio.ctx;
+    }
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
+    try {
+      studio.ctx = new AC();
+      studio.analyser = studio.ctx.createAnalyser();
+      studio.analyser.fftSize = 1024;
+      studio.buf = new Uint8Array(studio.analyser.fftSize);
+      studio.gain = studio.ctx.createGain();
+      studio.gain.gain.value = $('voiceOn').checked ? 1 : 0;
+      studio.analyser.connect(studio.gain);
+      studio.gain.connect(studio.ctx.destination);
+      if (studio.ctx.state === 'suspended' && studio.ctx.resume) studio.ctx.resume();
+      return true;
+    } catch (e) {
+      studio.ctx = null;
+      return false;
+    }
+  }
+  function clipInfo(url) {
+    return typeof url === 'string' && /^\/audio\/[a-f0-9]{40}\.mp3$/.test(url) ? { file: url } : null;
+  }
+  function fetchClip(info) {
+    var url = info.file;
+    if (!studio.cache[url]) {
+      studio.cache[url] = fetch(url)
+        .then(function (r) { if (!r.ok) throw new Error('clip ' + r.status); return r.arrayBuffer(); })
+        .then(function (ab) {
+          return new Promise(function (res, rej) { studio.ctx.decodeAudioData(ab, res, rej); });
+        });
+      studio.cache[url].catch(function () { delete studio.cache[url]; });
+    }
+    return studio.cache[url];
+  }
+  function prefetchAfter(idx, i) {
+    var seg = SEGMENTS[idx];
+    if (!seg) return;
+    for (var n = 1; n <= 2; n++) {
+      var ln = seg.lines[i + n];
+      var info = ln && clipInfo(ln[2]);
+      if (info) fetchClip(info).catch(function () {});
+    }
+  }
+  function studioReady() {
+    return $('voiceMode').value === 'studio' && !state.studioBroken && studio.available && ensureAudio();
+  }
+
+  function speak(key, text, audioUrl, idx, i) {
+    var info = clipInfo(audioUrl);
+    if (info && studioReady()) return speakStudio(key, text, info, idx, i);
+    return speakBrowser(key, text);
+  }
+
+  function speakStudio(key, text, info, idx, i) {
+    return new Promise(function (resolve) {
+      var finished = false, src = null, timers = [], t0 = 0, dur = 0, lastWord = -1;
+      function finish(next) {
+        if (finished) return;
+        finished = true;
+        timers.forEach(function (t) { if (t && t.clear) clearInterval(t.clear); else clearTimeout(t); });
+        studio.playing = false;
+        if (src) { src.onended = null; try { src.stop(); } catch (e) {} try { src.disconnect(); } catch (e) {} }
+        if (talking === key) talking = null;
+        state.cancelLine = null;
+        if (typeof next === 'function') next(); else resolve();
+      }
+      function fallback() {
+        // The clip would not load or decode. Use browser voices for the rest of the session.
+        state.studioBroken = true;
+        $('ttsNote').hidden = false;
+        $('ttsNote').textContent = 'The studio voice clips did not load, so the browser voices are filling in.';
+        if ($('voiceMode').value === 'studio') $('voiceMode').value = 'browser';
+        finish(function () { speakBrowser(key, text).then(resolve); });
+      }
+      state.cancelLine = finish;
+      showCaption(key, text);
+      setSpeaker(key);
+      talking = key;
+
+      timers.push(setTimeout(function () { if (!src) fallback(); }, 8000));
+      fetchClip(info).then(function (buffer) {
+        if (finished) return;
+        try {
+          src = studio.ctx.createBufferSource();
+          src.buffer = buffer;
+          src.connect(studio.analyser);
+          dur = buffer.duration;
+          src.onended = function () { finish(); };
+          src.start();
+          t0 = studio.ctx.currentTime;
+          studio.playing = true;
+        } catch (e) { fallback(); return; }
+        timers.push(setTimeout(finish, dur * 1000 + 3000));
+        // Highlight the caption roughly in step with the audio.
+        var words = [], re = /\S+/g, m;
+        while ((m = re.exec(text))) words.push([m.index, m[0].length]);
+        var tick = setInterval(function () {
+          if (finished) { clearInterval(tick); return; }
+          var frac = Math.min(1, Math.max(0, (studio.ctx.currentTime - t0) / dur));
+          var w = Math.min(words.length - 1, Math.floor(frac * words.length));
+          if (w !== lastWord && words[w]) { lastWord = w; showCaption(key, text, words[w][0], words[w][1]); }
+        }, 90);
+        timers.push({ clear: tick });
+        try { prefetchAfter(idx, i); } catch (e) {}
+      }).catch(function () { if (!finished) fallback(); });
+    });
+  }
+
+  function speakBrowser(key, text) {
+    return new Promise(function (resolve) {
+      var finished = false, started = false, timers = [];
+      var est = Math.max(1800, text.length * 64);
+      function finish() {
+        if (finished) return;
+        finished = true;
+        timers.forEach(clearTimeout);
+        if (talking === key) talking = null;
+        state.cancelLine = null;
+        resolve();
+      }
+      state.cancelLine = finish;
+      showCaption(key, text);
+      setSpeaker(key);
+      talking = key;
+
+      if (!hasTTS || !$('voiceOn').checked || state.ttsBroken) {
+        timers.push(setTimeout(finish, est));
+        return;
+      }
+      var u = new SpeechSynthesisUtterance(text);
+      var v = chosenVoice(key);
+      if (v) { u.voice = v; u.lang = v.lang; }
+      u.pitch = ANCHORS[key].pitch;
+      u.rate = ANCHORS[key].rate;
+      u.onstart = function () { started = true; };
+      u.onboundary = function (e) {
+        pulseUntil = performance.now() + 130;
+        if (typeof e.charIndex === 'number') showCaption(key, text, e.charIndex, e.charLength);
+      };
+      u.onend = finish;
+      u.onerror = finish;
+      timers.push(setTimeout(function () {
+        if (started || finished) return;
+        // Speech never began. Fall back to timed captions for the rest of the session.
+        state.ttsBroken = true;
+        u.onend = null; u.onerror = null;
+        try { speechSynthesis.cancel(); } catch (e) {}
+        $('ttsNote').hidden = false;
+        $('ttsNote').textContent = 'This browser did not start speech, so captions and mouths are running on a timer.';
+        timers.push(setTimeout(finish, est));
+      }, 3000));
+      timers.push(setTimeout(finish, est * 2.5 + 4000));
+      try {
+        speechSynthesis.speak(u);
+      } catch (e) {
+        state.ttsBroken = true;
+        timers.push(setTimeout(finish, est));
+      }
+    });
+  }
+
+  /* ------------------------- Show loop ------------------------- */
+  async function runLoop(id) {
+    while (state.runId === id) {
+      var idx = state.index;
+      var seg = SEGMENTS[idx];
+      if (!seg) return;
+      aired[seg.id] = true;
+      state.lastId = seg.id;
+      setSegment(idx);
+      var lines = seg.lines;
+      for (var i = 0; i < lines.length; i++) {
+        if (state.runId !== id) return;
+        await speak(lines[i][0], lines[i][1], lines[i][2], idx, i);
+        if (state.runId !== id) return;
+        await sleep(350);
+      }
+      if (state.runId !== id) return;
+      await sleep(900);
+      if (state.runId !== id) return;
+      state.index = pickNext();
+    }
+  }
+
+  /* Unaired stories first (newest first), then the sign-off, then start over. */
+  function pickNext() {
+    var n = SEGMENTS.length, k;
+    if (n < 2) return 0;
+    for (k = 0; k < n; k++) if (SEGMENTS[k].id !== 'signoff' && !aired[SEGMENTS[k].id]) return k;
+    var sign = -1;
+    for (k = 0; k < n; k++) if (SEGMENTS[k].id === 'signoff') sign = k;
+    if (sign >= 0 && state.lastId !== 'signoff') return sign;
+    aired = {};
+    return 0;
+  }
+
+  function stopSpeech() {
+    state.runId++;
+    if (hasTTS) { try { speechSynthesis.cancel(); } catch (e) {} }
+    if (state.cancelLine) state.cancelLine();
+    talking = null;
+    setSpeaker(null);
+  }
+  function updateUI() {
+    $('stage').setAttribute('data-live', state.running ? 'on' : 'off');
+    $('liveText').textContent = state.running ? 'LIVE' : 'OFF AIR';
+    $('goLabel').textContent = state.running ? 'Pause' : 'Go live';
+    $('goBtn').setAttribute('data-on', state.running ? 'true' : 'false');
+    setSegment(state.index);
+  }
+  function start() {
+    if ($('voiceMode').value === 'studio') ensureAudio();
+    state.running = true;
+    state.runId++;
+    updateUI();
+    runLoop(state.runId);
+  }
+  function pause() {
+    state.running = false;
+    stopSpeech();
+    updateUI();
+  }
+  function jump(i) {
+    var n = SEGMENTS.length;
+    stopSpeech();
+    state.index = ((i % n) + n) % n;
+    if (state.running) {
+      state.runId++;
+      updateUI();
+      runLoop(state.runId);
+    } else {
+      updateUI();
+      idleCaption();
+    }
+  }
+
+  $('goBtn').addEventListener('click', function () { state.running ? pause() : start(); });
+  $('nextBtn').addEventListener('click', function () { jump(state.index + 1); });
+  $('voiceOn').addEventListener('change', function () {
+    if (studio.gain) studio.gain.gain.value = this.checked ? 1 : 0;
+    if (!this.checked && hasTTS) { try { speechSynthesis.cancel(); } catch (e) {} }
+  });
+  $('voiceMode').addEventListener('change', function () {
+    if (hasTTS) { try { speechSynthesis.cancel(); } catch (e) {} }
+    $('voiceBox').hidden = !(this.value === 'browser' && voices.length);
+    if (this.value === 'studio' && state.running) ensureAudio();
+  });
+
+  /* ------------------------- Clock ------------------------- */
+  function tick() {
+    try {
+      $('clock').textContent = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    } catch (e) { $('clock').textContent = ''; }
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  /* ------------------------- Live feed ------------------------- */
+  var POLL_MS = 30000, etag = null, version = null, failures = 0, firstLoad = true;
+
+  function validate(d) {
+    if (!d || !Array.isArray(d.stories) || !d.stories.length) return null;
+    var ok = d.stories.every(function (s) {
+      return s && s.id && s.source && Array.isArray(s.facts) && s.facts.length >= 3 && s.stat &&
+        Array.isArray(s.lines) && s.lines.length && s.lines.every(function (l) { return Array.isArray(l) && l.length >= 2; });
+    });
+    return ok ? d : null;
+  }
+  function stamp(d) {
+    var t = new Date(d.updatedAt || Date.now());
+    var txt;
+    try { txt = t.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); } catch (e) { txt = ''; }
+    $('asOf').textContent = failures >= 3 ? 'Feed offline, showing the last update' : 'Live feed, updated ' + txt;
+  }
+  function syncVoiceOption(d) {
+    var any = d.stories.some(function (s) { return s.lines.some(function (l) { return clipInfo(l[2]); }); });
+    var AC = window.AudioContext || window.webkitAudioContext;
+    var sel = $('voiceMode'), opt = sel.querySelector('option[value="studio"]');
+    studio.available = !!(any && AC);
+    if (studio.available && !opt) {
+      opt = document.createElement('option');
+      opt.value = 'studio';
+      opt.textContent = 'Studio voices (AI)';
+      sel.insertBefore(opt, sel.firstChild);
+      if (!state.studioBroken) { sel.value = 'studio'; $('voiceBox').hidden = true; }
+    } else if (!studio.available && opt) {
+      if (sel.value === 'studio') { sel.value = 'browser'; $('voiceBox').hidden = !voices.length; }
+      opt.remove();
+    }
+  }
+  function applyData(d) {
+    var playingId = state.running || !firstLoad ? (SEGMENTS[state.index] || {}).id : null;
+    SEGMENTS = d.stories;
+    var at = playingId ? SEGMENTS.findIndex(function (s) { return s.id === playingId; }) : 0;
+    state.index = at >= 0 ? at : 0;
+    var live = {};
+    SEGMENTS.forEach(function (s) { live[s.id] = true; });
+    Object.keys(aired).forEach(function (k) { if (!live[k]) delete aired[k]; });
+    syncVoiceOption(d);
+    buildRundown();
+    buildTicker();
+    if (state.running) {
+      var btns = rundown.querySelectorAll('.rd');
+      if (btns[state.index]) {
+        btns[state.index].setAttribute('aria-current', 'true');
+        btns[state.index].querySelector('.rt b').textContent = 'ON AIR';
+      }
+    } else {
+      setSegment(state.index);
+      if (firstLoad) idleCaption();
+    }
+    $('goBtn').disabled = false;
+    $('nextBtn').disabled = false;
+    firstLoad = false;
+  }
+  function poll() {
+    if (typeof fetch !== 'function') return;
+    var ctl = typeof AbortController === 'function' ? new AbortController() : null;
+    var t = setTimeout(function () { if (ctl) ctl.abort(); }, 8000);
+    var headers = {};
+    if (etag) headers['if-none-match'] = etag;
+    var opts = { cache: 'no-store', headers: headers };
+    if (ctl) opts.signal = ctl.signal;
+    fetch('api/stories', opts)
+      .then(function (r) {
+        clearTimeout(t);
+        if (r.status === 304) { failures = 0; return null; }
+        if (!r.ok) throw new Error('bad status');
+        etag = r.headers.get('etag') || null;
+        return r.json();
+      })
+      .then(function (d) {
+        if (d === null) { if (lastData) { failures = 0; stamp(lastData); } return; }
+        d = validate(d);
+        if (!d) throw new Error('bad data');
+        failures = 0;
+        lastData = d;
+        if (d.version !== version) { version = d.version; applyData(d); }
+        stamp(d);
+      })
+      .catch(function () {
+        clearTimeout(t);
+        failures++;
+        if (firstLoad) showCaption('desk', 'The feed could not be reached. Retrying...');
+        else if (lastData) stamp(lastData);
+      });
+  }
+  var lastData = null;
+  showCaption('desk', 'Loading the rundown...');
+  poll();
+  setInterval(poll, POLL_MS);
+})();
+</script>
+
+</body></html>
